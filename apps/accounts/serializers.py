@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id', 'email', 'first_name', 'last_name', 'role', 'phone',
                   'mfa_enabled', 'clinic', 'is_active', 'created_at']
-        read_only_fields = ['id', 'created_at', 'role']
+        read_only_fields = ['id', 'created_at', 'role', 'clinic', 'is_active']
 
 
 class PasswordChangeSerializer(serializers.Serializer):

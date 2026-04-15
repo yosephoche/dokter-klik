@@ -5,9 +5,13 @@ WILL NOT WORK on encrypted fields because each encryption produces different
 ciphertext. Use a companion plaintext search field (e.g. name_search) for
 filtering. See Patient.name_search for the pattern.
 """
+import logging
+
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 from django.db import models
+
+logger = logging.getLogger(__name__)
 
 
 def _get_fernet() -> Fernet:
@@ -33,7 +37,8 @@ class EncryptedMixin:
     def _decrypt(self, value: bytes) -> str:
         try:
             return _get_fernet().decrypt(bytes(value)).decode('utf-8')
-        except (InvalidToken, Exception):
+        except InvalidToken:
+            logger.error('Decryption failed — InvalidToken. Data may be corrupt or encryption key mismatch.')
             return ''
 
 

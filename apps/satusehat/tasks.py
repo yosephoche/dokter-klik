@@ -104,7 +104,7 @@ def retry_failed_syncs():
         resource_type='Encounter',
         attempt_count__lt=5,
         last_attempt_at__lt=timezone.now() - datetime.timedelta(minutes=30),
-    ).values_list('local_id', flat=True)[:500]
+    ).order_by('last_attempt_at', 'id').values_list('local_id', flat=True)[:500]
 
     count = 0
     for local_id in failed:

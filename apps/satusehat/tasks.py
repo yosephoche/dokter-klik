@@ -51,6 +51,7 @@ def sync_encounter_to_satusehat(self, visit_id: str):
             if 'identifier' in safe_patient_payload:
                 safe_patient_payload['identifier'] = '[REDACTED]'
             log.request_payload = {'Patient': safe_patient_payload}
+            log.save(update_fields=['request_payload', 'updated_at'])
             patient_resp = client.post_resource('Patient', patient_payload)
             visit.patient.satusehat_patient_id = patient_resp.get('id', '')
             visit.patient.save(update_fields=['satusehat_patient_id'])

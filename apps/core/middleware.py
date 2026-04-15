@@ -47,7 +47,7 @@ class AuditLogMiddleware:
     def _get_client_ip(request):
         x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded:
-            return x_forwarded.split(',')[0].strip()
+            return x_forwarded.split(',')[-1].strip()
         return request.META.get('REMOTE_ADDR')
 
 
@@ -60,7 +60,7 @@ class SessionTimeoutMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated:
+        if hasattr(request, 'user') and request.user.is_authenticated:
             last_activity = request.session.get('last_activity')
             now = time.time()
             if last_activity and (now - last_activity) > self.SESSION_TIMEOUT:

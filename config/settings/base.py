@@ -6,7 +6,7 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Security
-SECRET_KEY = config('SECRET_KEY', default='insecure-dev-key-change-in-production')
+SECRET_KEY = config('SECRET_KEY')
 DEBUG = False
 ALLOWED_HOSTS = []
 
@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'whitenoise.runserver_nostatic',
     'django_celery_beat',
@@ -166,7 +167,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
@@ -187,8 +188,8 @@ CELERY_TASK_ROUTES = {
 
 # File Storage (MinIO/S3)
 MINIO_ENDPOINT = config('MINIO_ENDPOINT', default='localhost:9000')
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='minioadmin')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='minioadmin123')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='dokterklik')
 AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default='http://localhost:9000')
 AWS_S3_CUSTOM_DOMAIN = None

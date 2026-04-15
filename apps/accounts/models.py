@@ -36,7 +36,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         'clinics.Clinic',
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='users',
     )
     role = models.CharField(max_length=20, choices=ROLES, default='admin')

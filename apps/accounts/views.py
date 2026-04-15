@@ -1,10 +1,15 @@
 """Auth views: login, logout, profile, password change."""
+import logging
+
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+
+logger = logging.getLogger(__name__)
 
 from .models import CustomUser
 from .serializers import LoginSerializer, UserSerializer, PasswordChangeSerializer
@@ -37,8 +42,10 @@ class LogoutView(APIView):
             if refresh_token:
                 token = RefreshToken(refresh_token)
                 token.blacklist()
+        except TokenError as e:
+            logger.warning('Token blacklist failed during logout: %s', e)
         except Exception:
-            pass
+            logger.exception('Unexpected error during logout token blacklisting')
         return Response({'detail': 'Logged out.'})
 
 

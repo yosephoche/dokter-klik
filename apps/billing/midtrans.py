@@ -1,5 +1,6 @@
 """Midtrans payment gateway client for QRIS and Virtual Account payments."""
 import hashlib
+import hmac
 import logging
 import requests
 from base64 import b64encode
@@ -84,4 +85,4 @@ class MidtransClient:
         """
         raw = f'{order_id}{status_code}{gross_amount}{self.server_key}'
         expected = hashlib.sha512(raw.encode()).hexdigest()
-        return expected == signature_key
+        return hmac.compare_digest(expected, signature_key)

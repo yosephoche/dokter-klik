@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antrean — {{ clinic.name }}</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #1e3a5f; color: white; }
+    .number-display { font-size: 8rem; font-weight: 900; line-height: 1; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-8">
+
+  <div class="text-center mb-8">
+    <h1 class="text-3xl font-bold opacity-80">{{ clinic.name }}</h1>
+    <p class="opacity-60 mt-1">Sistem Antrean Digital</p>
+  </div>
+
+  <!-- Live queue board — polls every 5 seconds -->
+  <div id="queue-board"
+       hx-get="{{ url('queue-live-partial', kwargs={'clinic_slug': clinic.slug}) }}"
+       hx-trigger="every 5s"
+       hx-swap="outerHTML">
+    {% include "queue/partials/queue_board.html" %}
+  </div>
+
+  <p class="mt-12 text-sm opacity-40">Diperbarui otomatis setiap 5 detik</p>
+</body>
+</html>

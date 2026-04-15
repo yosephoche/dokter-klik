@@ -1,0 +1,27 @@
+<div id="queue-board" class="w-full max-w-2xl">
+  <!-- Currently serving -->
+  <div class="bg-white bg-opacity-10 rounded-2xl p-8 text-center mb-6 border-2 border-white border-opacity-30">
+    <p class="text-lg opacity-70 mb-2">Sedang Dilayani</p>
+    {% if serving %}
+      <div class="number-display text-yellow-300">{{ serving.queue_number }}</div>
+    {% else %}
+      <div class="text-4xl opacity-40">—</div>
+    {% endif %}
+  </div>
+
+  <!-- Called next -->
+  {% if called %}
+  <div class="bg-blue-800 bg-opacity-60 rounded-2xl p-6 text-center mb-6">
+    <p class="text-sm opacity-70 mb-1">Dipanggil Berikutnya</p>
+    <div class="text-5xl font-bold">{{ called.queue_number }}</div>
+  </div>
+  {% endif %}
+
+  <!-- Waiting count -->
+  <div class="text-center">
+    <p class="text-xl opacity-70">
+      <span class="font-bold text-2xl text-white">{{ waiting_count }}</span>
+      pasien menunggu
+    </p>
+  </div>
+</div>

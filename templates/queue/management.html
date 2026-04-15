@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Kelola Antrean — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Antrean Hari Ini</h1>
+  <div class="flex gap-3">
+    <a href="{{ url('queue-live', kwargs={'clinic_slug': request.user.clinic.slug}) }}"
+       target="_blank"
+       class="border px-3 py-2 rounded text-sm hover:bg-gray-50">
+      Tampilan Publik ↗
+    </a>
+    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            hx-get="{{ url('queue-list') }}"
+            hx-target="#queue-entries"
+            hx-swap="innerHTML">
+      Refresh
+    </button>
+  </div>
+</div>
+
+<div id="queue-entries"
+     hx-get="{{ url('queue-list') }}"
+     hx-trigger="load, every 10s"
+     hx-swap="innerHTML">
+  <p class="text-gray-400">Memuat antrean...</p>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title>{% block title %}DokterKlik{% endblock %}</title>
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.12" crossorigin="anonymous"></script>
+  <!-- Tailwind CSS (CDN for MVP) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ static('css/main.css') }}">
+</head>
+<body hx-boost="true" class="bg-gray-50 text-gray-900 min-h-screen">
+
+  <!-- Navigation -->
+  <nav class="bg-blue-700 text-white px-4 py-3 flex items-center justify-between shadow">
+    <a href="{{ url('dashboard') }}" class="font-bold text-xl">DokterKlik</a>
+    <div class="flex items-center gap-4 text-sm">
+      {% if request.user.is_authenticated %}
+        {% if request.user.role in ('admin', 'owner') %}
+          <a href="{{ url('patient-list') }}" class="hover:underline">Pasien</a>
+          <a href="{{ url('queue-list') }}" class="hover:underline">Antrean</a>
+          <a href="{{ url('invoice-list') }}" class="hover:underline">Billing</a>
+        {% endif %}
+        {% if request.user.role in ('doctor',) %}
+          <a href="{{ url('visit-list') }}" class="hover:underline">Kunjungan</a>
+        {% endif %}
+        {% if request.user.role in ('pharmacy', 'admin', 'owner') %}
+          <a href="{{ url('drug-list') }}" class="hover:underline">Inventori</a>
+        {% endif %}
+        <span class="opacity-75">{{ request.user.full_name }}</span>
+        <a href="{{ url('auth-logout') }}" class="bg-blue-900 px-3 py-1 rounded hover:bg-blue-800">Keluar</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Flash messages -->
+  <div id="messages" class="container mx-auto px-4 mt-2">
+    {% for message in messages %}
+      <div class="p-3 mb-2 rounded text-sm
+        {% if message.tags == 'error' %}bg-red-100 text-red-800
+        {% elif message.tags == 'success' %}bg-green-100 text-green-800
+        {% else %}bg-blue-100 text-blue-800{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Main content -->
+  <main class="container mx-auto px-4 py-6">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    // Inject CSRF token into all HTMX requests
+    document.body.addEventListener('htmx:configRequest', function(evt) {
+      const csrfCookie = document.cookie.split(';')
+        .find(c => c.trim().startsWith('csrftoken='));
+      if (csrfCookie) {
+        evt.detail.headers['X-CSRFToken'] = csrfCookie.split('=')[1];
+      }
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

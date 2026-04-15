@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-xl shadow p-8">
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h1 class="text-xl font-bold">INVOICE</h1>
+      <p class="text-gray-500 text-sm">{{ invoice.invoice_number }}</p>
+    </div>
+    <span class="px-3 py-1 rounded-full text-sm font-medium
+      {% if invoice.payment_status == 'paid' %}bg-green-100 text-green-800
+      {% elif invoice.payment_status == 'cancelled' %}bg-red-100 text-red-800
+      {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+      {{ invoice.payment_status|title }}
+    </span>
+  </div>
+
+  <!-- Breakdown -->
+  <table class="w-full text-sm mb-6">
+    <tbody>
+      <tr class="border-b">
+        <td class="py-2 text-gray-600">Biaya Konsultasi</td>
+        <td class="py-2 text-right font-medium">Rp {{ "{:,.0f}".format(invoice.total_consultation) }}</td>
+      </tr>
+      {% if invoice.total_procedures > 0 %}
+      <tr class="border-b">
+        <td class="py-2 text-gray-600">Tindakan</td>
+        <td class="py-2 text-right font-medium">Rp {{ "{:,.0f}".format(invoice.total_procedures) }}</td>
+      </tr>
+      {% endif %}
+      {% if invoice.total_drugs > 0 %}
+      <tr class="border-b">
+        <td class="py-2 text-gray-600">Obat</td>
+        <td class="py-2 text-right font-medium">Rp {{ "{:,.0f}".format(invoice.total_drugs) }}</td>
+      </tr>
+      {% endif %}
+      {% if invoice.discount > 0 %}
+      <tr class="border-b text-red-600">
+        <td class="py-2">Diskon</td>
+        <td class="py-2 text-right">- Rp {{ "{:,.0f}".format(invoice.discount) }}</td>
+      </tr>
+      {% endif %}
+      <tr class="border-t-2 font-bold text-base">
+        <td class="pt-3">Total</td>
+        <td class="pt-3 text-right">Rp {{ "{:,.0f}".format(invoice.grand_total) }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Payment actions -->
+  {% if invoice.payment_status == 'pending' %}
+  <div class="flex gap-3 mt-4">
+    <button class="flex-1 bg-gray-800 text-white px-4 py-3 rounded-lg font-medium hover:bg-gray-700"
+            hx-post="{{ url('invoice-pay-cash', args=[invoice.id]) }}"
+            hx-swap="none"
+            hx-on::after-request="window.location.reload()">
+      Bayar Tunai
+    </button>
+    <button class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700"
+            hx-post="{{ url('invoice-pay-qris', args=[invoice.id]) }}"
+            hx-target="#qris-container"
+            hx-swap="innerHTML">
+      Bayar QRIS
+    </button>
+  </div>
+  <div id="qris-container" class="mt-4 text-center"></div>
+  {% elif invoice.payment_status == 'paid' %}
+  <div class="text-center text-green-600 font-medium mt-4">
+    Lunas — {{ invoice.paid_at|datetimeformat if invoice.paid_at else '' }}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

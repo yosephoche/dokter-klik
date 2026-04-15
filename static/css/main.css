@@ -1,0 +1,38 @@
+/* DokterKlik — base styles (supplementary to Tailwind CDN) */
+
+/* Mobile-first: minimum 360px viewport */
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* HTMX request indicator */
+.htmx-indicator {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  opacity: 1;
+}
+
+/* Tab transitions */
+.tab-content { transition: opacity 0.15s ease; }
+.tab-content.hidden { display: none; }
+
+/* ICD-10 search results */
+#icd10-results > div {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+}
+#icd10-results > div:hover { background: #f0f9ff; }
+
+/* Queue display large number */
+@media (max-width: 640px) {
+  .number-display { font-size: 5rem; }
+}

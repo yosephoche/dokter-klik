@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Pasien — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Daftar Pasien</h1>
+  <a href="{{ url('patient-list') }}?action=new"
+     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    + Pasien Baru
+  </a>
+</div>
+
+<!-- Search bar with HTMX -->
+<div class="mb-4">
+  <input type="search"
+         name="q"
+         placeholder="Cari nama atau nomor RM..."
+         class="w-full md:w-96 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+         hx-get="{{ url('patient-list') }}"
+         hx-trigger="input changed delay:300ms, search"
+         hx-target="#patient-list"
+         hx-swap="innerHTML"
+         hx-include="this">
+</div>
+
+<!-- Patient list (HTMX target) -->
+<div id="patient-list"
+     hx-get="{{ url('patient-list') }}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <p class="text-gray-400">Memuat...</p>
+</div>
+{% endblock %}

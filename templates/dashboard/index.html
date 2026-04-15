@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="text-2xl font-bold">Selamat datang, {{ request.user.full_name }}</h1>
+  <p class="text-gray-500 text-sm">{{ request.user.clinic.name if request.user.clinic else '' }}</p>
+</div>
+
+<!-- Stats cards loaded via HTMX -->
+<div id="dashboard-stats"
+     hx-get="{{ url('dashboard-stats') }}"
+     hx-trigger="load, every 60s"
+     hx-swap="innerHTML">
+  <p class="text-gray-400">Memuat statistik...</p>
+</div>
+
+<!-- Quick actions -->
+<div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+  <a href="{{ url('patient-list') }}" class="bg-white rounded-lg p-4 shadow text-center hover:shadow-md transition">
+    <div class="text-3xl mb-2">👤</div>
+    <div class="font-medium">Daftar Pasien</div>
+  </a>
+  <a href="{{ url('queue-list') }}" class="bg-white rounded-lg p-4 shadow text-center hover:shadow-md transition">
+    <div class="text-3xl mb-2">📋</div>
+    <div class="font-medium">Kelola Antrean</div>
+  </a>
+  <a href="{{ url('invoice-list') }}" class="bg-white rounded-lg p-4 shadow text-center hover:shadow-md transition">
+    <div class="text-3xl mb-2">💳</div>
+    <div class="font-medium">Billing</div>
+  </a>
+  <a href="{{ url('drug-list') }}" class="bg-white rounded-lg p-4 shadow text-center hover:shadow-md transition">
+    <div class="text-3xl mb-2">💊</div>
+    <div class="font-medium">Inventori</div>
+  </a>
+</div>
+{% endblock %}

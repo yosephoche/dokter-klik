@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Form SOAP — {{ patient.name_search }} — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-4">
+    <div>
+      <h1 class="text-xl font-bold">{{ patient.name_search }}</h1>
+      <p class="text-sm text-gray-500">RM: {{ patient.medical_record_number }} | {{ visit.visit_date|datetimeformat }}</p>
+    </div>
+    <span class="px-3 py-1 rounded-full text-sm font-medium
+      {% if visit.status == 'finalized' %}bg-green-100 text-green-800
+      {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+      {{ visit.status|title }}
+    </span>
+  </div>
+
+  <!-- Autosave indicator -->
+  <div id="autosave-status" class="text-xs text-gray-400 mb-4">
+    Autosave aktif — setiap 30 detik
+  </div>
+
+  <!-- SOAP Form (autosave via HTMX) -->
+  <form id="soap-form"
+        hx-patch="{{ url('visit-autosave', args=[visit.id]) }}"
+        hx-trigger="every 30s"
+        hx-swap="none"
+        hx-on::after-request="document.getElementById('autosave-status').textContent = 'Tersimpan otomatis: ' + new Date().toLocaleTimeString('id-ID')">
+
+    <!-- Tabs -->
+    <div class="border-b mb-4">
+      <nav class="flex gap-2">
+        <button type="button" onclick="showTab('subjective')"
+                class="tab-btn px-4 py-2 border-b-2 border-blue-600 font-medium text-blue-600 text-sm">
+          Subjective (S)
+        </button>
+        <button type="button" onclick="showTab('objective')"
+                class="tab-btn px-4 py-2 border-b-2 border-transparent text-gray-500 text-sm hover:text-gray-700">
+          Objective (O)
+        </button>
+        <button type="button" onclick="showTab('assessment')"
+                class="tab-btn px-4 py-2 border-b-2 border-transparent text-gray-500 text-sm hover:text-gray-700">
+          Assessment (A)
+        </button>
+        <button type="button" onclick="showTab('plan')"
+                class="tab-btn px-4 py-2 border-b-2 border-transparent text-gray-500 text-sm hover:text-gray-700">
+          Plan (P)
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab: Subjective -->
+    <div id="tab-subjective" class="tab-content">
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Keluhan Utama</label>
+        <textarea name="chief_complaint" rows="2"
+                  class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.chief_complaint or '' }}</textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Anamnesis (Subjective)</label>
+        <textarea name="soap_subjective" rows="6"
+                  class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder="Riwayat penyakit sekarang, riwayat penyakit dahulu, riwayat keluarga..."
+                  {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_subjective or '' }}</textarea>
+      </div>
+    </div>
+
+    <!-- Tab: Objective -->
+    <div id="tab-objective" class="tab-content hidden">
+      <label class="block text-sm font-medium mb-1">Pemeriksaan Fisik (Objective)</label>
+      <textarea name="soap_objective" rows="8"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Tanda vital, pemeriksaan fisik, hasil laboratorium..."
+                {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_objective or '' }}</textarea>
+    </div>
+
+    <!-- Tab: Assessment -->
+    <div id="tab-assessment" class="tab-content hidden">
+      <label class="block text-sm font-medium mb-1">Penilaian Klinis (Assessment)</label>
+      <textarea name="soap_assessment_notes" rows="4"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none mb-4"
+                {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_assessment_notes or '' }}</textarea>
+
+      <!-- ICD-10 Search -->
+      <div class="mt-4">
+        <label class="block text-sm font-medium mb-1">Kode Diagnosis ICD-10</label>
+        <input type="text"
+               id="icd10-search"
+               placeholder="Ketik nama penyakit atau kode ICD-10 (min 2 karakter)..."
+               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+               hx-get="{{ url('icd10-search') }}"
+               hx-trigger="input changed delay:300ms"
+               hx-target="#icd10-results"
+               hx-swap="innerHTML"
+               hx-params="q,lang"
+               {% if visit.status == 'finalized' %}disabled{% endif %}>
+        <input type="hidden" name="lang" value="id">
+
+        <div id="icd10-results" class="border rounded-lg mt-1 max-h-48 overflow-y-auto hidden"></div>
+
+        <!-- Selected diagnoses -->
+        <div id="diagnosis-list" class="mt-3 space-y-2">
+          {% for diagnosis in visit.diagnoses.all() %}
+          <div class="flex items-center gap-2 bg-gray-50 rounded p-2 text-sm">
+            <span class="font-mono font-bold text-blue-700">{{ diagnosis.icd10_code }}</span>
+            <span>{{ diagnosis.icd10_description_id or diagnosis.icd10_description_en }}</span>
+            {% if diagnosis.is_primary %}
+              <span class="ml-auto bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">Primer</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Plan -->
+    <div id="tab-plan" class="tab-content hidden">
+      <label class="block text-sm font-medium mb-1">Rencana Tatalaksana (Plan)</label>
+      <textarea name="soap_plan_notes" rows="4"
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none mb-4"
+                {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_plan_notes or '' }}</textarea>
+
+      <!-- Prescriptions -->
+      <div class="mt-4">
+        <label class="block text-sm font-medium mb-2">Resep Obat</label>
+        <div id="prescription-list" class="space-y-2 mb-3">
+          {% for rx in visit.prescriptions.all() %}
+          <div class="bg-gray-50 rounded p-2 text-sm flex justify-between">
+            <span>{{ rx.drug_name }} — {{ rx.quantity }} {{ rx.unit }}</span>
+            <span class="text-gray-500">{{ rx.dosage_instruction }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Finalize button -->
+  {% if visit.status != 'finalized' %}
+  <div class="mt-6 flex justify-end gap-3">
+    <button type="button"
+            class="px-4 py-2 border rounded-lg hover:bg-gray-50"
+            hx-patch="{{ url('visit-autosave', args=[visit.id]) }}"
+            hx-include="#soap-form"
+            hx-swap="none">
+      Simpan Draft
+    </button>
+    <button type="button"
+            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium"
+            hx-post="{{ url('visit-finalize', args=[visit.id]) }}"
+            hx-include="#soap-form"
+            hx-confirm="Finalisasi kunjungan? Data tidak dapat diubah setelah ini."
+            hx-swap="none"
+            hx-on::after-request="window.location.reload()">
+      Simpan &amp; Finalisasi
+    </button>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('border-blue-600', 'text-blue-600');
+    btn.classList.add('border-transparent', 'text-gray-500');
+  });
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  event.target.classList.add('border-blue-600', 'text-blue-600');
+  event.target.classList.remove('border-transparent', 'text-gray-500');
+}
+
+// ICD-10 search result click → add diagnosis
+document.getElementById('icd10-results').addEventListener('click', function(e) {
+  const item = e.target.closest('[data-code]');
+  if (!item) return;
+  const code = item.dataset.code;
+  const desc = item.dataset.desc;
+  // POST to add diagnosis via HTMX
+  htmx.ajax('POST', '{{ url("diagnosis-list", kwargs={"visit_pk": visit.id}) }}', {
+    target: '#diagnosis-list',
+    swap: 'beforeend',
+    values: { icd10_code: code, icd10_description_id: desc, is_primary: false }
+  });
+  document.getElementById('icd10-results').classList.add('hidden');
+  document.getElementById('icd10-search').value = '';
+});
+
+// Hide results when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#icd10-search') && !e.target.closest('#icd10-results')) {
+    document.getElementById('icd10-results').classList.add('hidden');
+  }
+});
+
+document.getElementById('icd10-search').addEventListener('input', function() {
+  if (this.value.length >= 2) {
+    document.getElementById('icd10-results').classList.remove('hidden');
+  }
+});
+</script>
+{% endblock %}

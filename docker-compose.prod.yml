@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  web:
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 8 --timeout 120 --access-logfile - --error-logfile -
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    restart: always
+
+  celery:
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    restart: always
+
+  celery-beat:
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+    restart: always
+
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.prod.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    restart: always

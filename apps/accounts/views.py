@@ -44,6 +44,8 @@ class LogoutView(APIView):
                 token.blacklist()
         except TokenError as e:
             logger.warning('Token blacklist failed during logout: %s', e)
+        except Exception:
+            logger.exception('Unexpected error during logout token blacklisting')
         return Response({'detail': 'Logged out.'})
 
 

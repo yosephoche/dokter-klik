@@ -17,8 +17,6 @@ DokterKlik menggabungkan semua kebutuhan operasional klinik dalam satu platform:
 - **WhatsApp** — Booking, konfirmasi jadwal, resep digital, pengingat kontrol
 - **Inventori Apotek** — Stok obat, alert stok menipis
 
-**Model bisnis**: SaaS multi-tenant — Starter (gratis) / Pro (Rp 150.000/bln) / Plus (Rp 300.000/bln)
-
 ---
 
 ## Tech Stack

@@ -45,7 +45,12 @@ def sync_encounter_to_satusehat(self, visit_id: str):
         # 1. Sync Patient
         if not visit.patient.satusehat_patient_id:
             patient_payload = build_patient_resource(visit.patient)
-            log.request_payload = {'Patient': patient_payload}
+            # Redact identifier (NIK) from logged payload to prevent PII leak
+            import copy
+            safe_patient_payload = copy.deepcopy(patient_payload)
+            if 'identifier' in safe_patient_payload:
+                safe_patient_payload['identifier'] = '[REDACTED]'
+            log.request_payload = {'Patient': safe_patient_payload}
             patient_resp = client.post_resource('Patient', patient_payload)
             visit.patient.satusehat_patient_id = patient_resp.get('id', '')
             visit.patient.save(update_fields=['satusehat_patient_id'])
@@ -93,18 +98,17 @@ def retry_failed_syncs():
     from django.utils import timezone
     import datetime
 
-    cutoff = timezone.now() - datetime.timedelta(hours=24)
     failed = SyncLog.objects.filter(
         status='failed',
+        resource_type='Encounter',
         attempt_count__lt=5,
         last_attempt_at__lt=timezone.now() - datetime.timedelta(minutes=30),
-    ).select_related('clinic')
+    ).values_list('local_id', flat=True)[:500]
 
     count = 0
-    for log in failed:
-        if log.resource_type == 'Encounter':
-            sync_encounter_to_satusehat.delay(log.local_id)
-            count += 1
+    for local_id in failed:
+        sync_encounter_to_satusehat.delay(local_id)
+        count += 1
     logger.info('Queued %d failed SATUSEHAT syncs for retry', count)
 
 

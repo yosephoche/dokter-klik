@@ -36,12 +36,14 @@
           <button class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "called"}'
+                  hx-swap="none"
                   hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
             Panggil
           </button>
           <button class="bg-red-100 text-red-700 text-xs px-3 py-1 rounded hover:bg-red-200"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "skipped"}'
+                  hx-swap="none"
                   hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
             Lewati
           </button>
@@ -49,6 +51,7 @@
           <button class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "serving"}'
+                  hx-swap="none"
                   hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
             Layani
           </button>
@@ -56,6 +59,7 @@
           <button class="bg-gray-600 text-white text-xs px-3 py-1 rounded hover:bg-gray-700"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "done"}'
+                  hx-swap="none"
                   hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
             Selesai
           </button>

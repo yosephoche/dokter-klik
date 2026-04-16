@@ -1,13 +1,19 @@
 """Queue management web/HTMX views."""
 import datetime
+import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import IntegrityError, transaction
+from django.db.models import Max
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from django.views.generic import TemplateView
 
 from .models import QueueEntry
+
+logger = logging.getLogger(__name__)
 
 
 class QueueManagePageView(LoginRequiredMixin, TemplateView):
@@ -43,6 +49,9 @@ class QueueEntryCreateView(LoginRequiredMixin, View):
         from apps.patients.models import Patient
 
         clinic = request.user.clinic
+        if not clinic:
+            return HttpResponse('Akun belum terhubung ke klinik.', status=400)
+
         patient = None
         patient_id = request.POST.get('patient_id', '').strip()
         if patient_id:
@@ -64,21 +73,38 @@ class QueueEntryCreateView(LoginRequiredMixin, View):
         if source not in ('walkin', 'whatsapp', 'online'):
             source = 'walkin'
 
-        next_number = QueueEntry.get_next_number(clinic)
-        QueueEntry.objects.create(
-            clinic=clinic,
-            patient=patient,
-            doctor=doctor,
-            queue_number=next_number,
-            source=source,
-            status='waiting',
-        )
+        today = datetime.date.today()
+        for attempt in range(3):
+            try:
+                with transaction.atomic():
+                    # Lock today's entries for this clinic to prevent concurrent numbering
+                    agg = QueueEntry.objects.select_for_update().filter(
+                        clinic=clinic, queue_date=today
+                    ).aggregate(Max('queue_number'))
+                    next_number = (agg['queue_number__max'] or 0) + 1
+                    QueueEntry.objects.create(
+                        clinic=clinic,
+                        patient=patient,
+                        doctor=doctor,
+                        queue_number=next_number,
+                        source=source,
+                        status='waiting',
+                    )
+                break
+            except IntegrityError:
+                logger.warning(
+                    'Queue number collision for clinic %s, attempt %d/3',
+                    clinic.id, attempt + 1,
+                )
+                if attempt == 2:
+                    raise
+
         # Re-render the full queue list as HTMX partial response
         entries = QueueEntry.objects.filter(
-            clinic=clinic, queue_date=datetime.date.today()
+            clinic=clinic, queue_date=today
         ).select_related('patient', 'doctor').order_by('queue_number')
 
         return render(request, 'queue/partials/queue_management_rows.html', {
             'entries': entries,
-            'today': datetime.date.today(),
+            'today': today,
         })

@@ -4,6 +4,7 @@ import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.middleware.csrf import get_token
 
@@ -35,7 +36,13 @@ class LoginWebView(View):
             })
 
         login(request, user)
-        next_url = request.GET.get('next') or reverse('dashboard')
+        next_url = request.GET.get('next', '')
+        if not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = reverse('dashboard')
         return redirect(next_url)
 
 

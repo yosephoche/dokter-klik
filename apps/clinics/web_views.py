@@ -1,5 +1,6 @@
 """Clinic web/HTMX views: onboarding, settings, user management."""
 import re
+from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -104,11 +105,12 @@ class ClinicSettingsView(LoginRequiredMixin, View):
         if not name:
             errors['name'] = 'Nama klinik wajib diisi.'
 
-        consultation_fee = request.POST.get('consultation_fee', '0').strip()
+        consultation_fee_str = request.POST.get('consultation_fee', '0').strip()
         try:
-            consultation_fee = float(consultation_fee)
-        except ValueError:
+            consultation_fee = Decimal(consultation_fee_str or '0')
+        except InvalidOperation:
             errors['consultation_fee'] = 'Biaya konsultasi harus berupa angka.'
+            consultation_fee = Decimal('0')
 
         if errors:
             return render(request, 'clinics/settings.html', {

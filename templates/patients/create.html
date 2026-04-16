@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Pasien Baru — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <a href="{{ url('patient-list-web') }}" class="text-gray-400 hover:text-gray-600 text-sm">← Daftar Pasien</a>
+    <span class="text-gray-300">/</span>
+    <h1 class="text-xl font-bold">Daftar Pasien Baru</h1>
+  </div>
+
+  {% if errors.__all__ %}
+  <div class="mb-4 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 text-sm">
+    {{ errors.__all__ }}
+  </div>
+  {% endif %}
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <form method="post" action="{{ url('patient-create') }}">
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <!-- Nama -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Nama Lengkap <span class="text-red-500">*</span>
+          </label>
+          <input type="text" name="name" required
+                 value="{{ data.name if data else '' }}"
+                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                        {{ 'border-red-400' if errors.name else 'border-gray-300' }}">
+          {% if errors.name %}
+            <p class="text-red-500 text-xs mt-1">{{ errors.name }}</p>
+          {% endif %}
+        </div>
+
+        <!-- NIK -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
+          <input type="text" name="nik" maxlength="16"
+                 value="{{ data.nik if data else '' }}"
+                 placeholder="16 digit NIK"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Tanggal Lahir -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
+          <input type="date" name="dob"
+                 value="{{ data.dob if data else '' }}"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Jenis Kelamin -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Jenis Kelamin <span class="text-red-500">*</span>
+          </label>
+          <select name="gender" required
+                  class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                         {{ 'border-red-400' if errors.gender else 'border-gray-300' }}">
+            <option value="">Pilih...</option>
+            <option value="male" {{ 'selected' if data and data.gender == 'male' else '' }}>Laki-laki</option>
+            <option value="female" {{ 'selected' if data and data.gender == 'female' else '' }}>Perempuan</option>
+            <option value="other" {{ 'selected' if data and data.gender == 'other' else '' }}>Lainnya</option>
+          </select>
+          {% if errors.gender %}
+            <p class="text-red-500 text-xs mt-1">{{ errors.gender }}</p>
+          {% endif %}
+        </div>
+
+        <!-- No. Telepon -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
+          <input type="tel" name="phone"
+                 value="{{ data.phone if data else '' }}"
+                 placeholder="08xxxxxxxxxx"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Golongan Darah -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Golongan Darah</label>
+          <select name="blood_type"
+                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Tidak diketahui</option>
+            {% for bt in ['A', 'B', 'AB', 'O', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+              <option value="{{ bt }}" {{ 'selected' if data and data.blood_type == bt else '' }}>{{ bt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Alamat -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+          <textarea name="address" rows="2"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ data.address if data else '' }}</textarea>
+        </div>
+
+        <!-- Catatan Alergi -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Alergi</label>
+          <textarea name="allergy_notes" rows="2"
+                    placeholder="Alergi obat, makanan, dll."
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ data.allergy_notes if data else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6 justify-end">
+        <a href="{{ url('patient-list-web') }}"
+           class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">
+          Batal
+        </a>
+        <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+          Simpan Pasien
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

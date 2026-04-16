@@ -3,16 +3,18 @@
 {% block title %}Kelola Antrean — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
+<div class="flex items-center justify-between mb-4">
   <h1 class="text-2xl font-bold">Antrean Hari Ini</h1>
   <div class="flex gap-3">
+    {% if request.user.clinic %}
     <a href="{{ url('queue-live', kwargs={'clinic_slug': request.user.clinic.slug}) }}"
        target="_blank"
        class="border px-3 py-2 rounded text-sm hover:bg-gray-50">
       Tampilan Publik ↗
     </a>
+    {% endif %}
     <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-            hx-get="{{ url('queue-list') }}"
+            hx-get="{{ url('queue-list-partial') }}"
             hx-target="#queue-entries"
             hx-swap="innerHTML">
       Refresh
@@ -20,10 +22,82 @@
   </div>
 </div>
 
+<!-- Form tambah antrean -->
+<div class="bg-white rounded-xl shadow p-4 mb-6">
+  <p class="text-sm font-medium text-gray-700 mb-3">Tambah Antrean Walk-in</p>
+  <form hx-post="{{ url('queue-entry-create') }}"
+        hx-target="#queue-entries"
+        hx-swap="innerHTML"
+        class="flex flex-wrap gap-3 items-end">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
+
+    <!-- Patient search -->
+    <div class="flex-1 min-w-48">
+      <label class="block text-xs text-gray-500 mb-1">Cari Pasien (opsional)</label>
+      <input type="text"
+             id="patient-search-input"
+             placeholder="Nama atau No. RM..."
+             autocomplete="off"
+             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+             hx-get="{{ url('patient-list-partial') }}"
+             hx-trigger="input changed delay:300ms"
+             hx-target="#patient-dropdown"
+             hx-swap="innerHTML"
+             hx-include="this"
+             hx-params="q">
+      <input type="hidden" name="patient_id" id="patient_id_input">
+      <div id="patient-dropdown"
+           class="border rounded-lg mt-1 max-h-40 overflow-y-auto hidden bg-white shadow-md z-10 absolute"></div>
+    </div>
+
+    <!-- Source -->
+    <div>
+      <label class="block text-xs text-gray-500 mb-1">Sumber</label>
+      <select name="source"
+              class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="walkin">Walk-in</option>
+        <option value="whatsapp">WhatsApp</option>
+        <option value="online">Online</option>
+      </select>
+    </div>
+
+    <button type="submit"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
+      + Tambah
+    </button>
+  </form>
+</div>
+
 <div id="queue-entries"
-     hx-get="{{ url('queue-list') }}"
+     hx-get="{{ url('queue-list-partial') }}"
      hx-trigger="load, every 10s"
      hx-swap="innerHTML">
   <p class="text-gray-400">Memuat antrean...</p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Patient dropdown: when user clicks a patient row, fill hidden input
+document.getElementById('patient-dropdown').addEventListener('click', function(e) {
+  const row = e.target.closest('tr[data-patient-id]');
+  if (!row) return;
+  document.getElementById('patient_id_input').value = row.dataset.patientId;
+  document.getElementById('patient-search-input').value = row.dataset.patientName;
+  this.classList.add('hidden');
+});
+
+// Hide dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#patient-search-input') && !e.target.closest('#patient-dropdown')) {
+    document.getElementById('patient-dropdown').classList.add('hidden');
+  }
+});
+
+document.getElementById('patient-search-input').addEventListener('input', function() {
+  if (this.value.length >= 2) {
+    document.getElementById('patient-dropdown').classList.remove('hidden');
+  }
+});
+</script>
 {% endblock %}

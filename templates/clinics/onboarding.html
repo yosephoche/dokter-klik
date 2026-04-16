@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Daftarkan Klinik — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="min-h-[70vh] flex items-center justify-center">
+  <div class="w-full max-w-lg">
+
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Selamat Datang di DokterKlik</h1>
+      <p class="text-gray-500 mt-2 text-sm">Daftarkan klinik Anda untuk mulai menggunakan semua fitur.</p>
+    </div>
+
+    {% if errors.__all__ %}
+    <div class="mb-4 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 text-sm">
+      {{ errors.__all__ }}
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-xl shadow p-8">
+      <form method="post" action="{{ url('clinic-onboarding') }}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
+
+        <div class="space-y-4">
+
+          <!-- Nama Klinik -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Nama Klinik <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="name" required autofocus
+                   value="{{ data.name if data else '' }}"
+                   placeholder="cth. Klinik Pratama Sehat Bersama"
+                   class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                          {{ 'border-red-400' if errors.name else 'border-gray-300' }}">
+            {% if errors.name %}
+              <p class="text-red-500 text-xs mt-1">{{ errors.name }}</p>
+            {% endif %}
+          </div>
+
+          <!-- Telepon -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
+            <input type="text" name="phone"
+                   value="{{ data.phone if data else '' }}"
+                   placeholder="cth. 0411-123456"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email Klinik</label>
+            <input type="email" name="email"
+                   value="{{ data.email if data else '' }}"
+                   placeholder="cth. info@klinik.com"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+
+          <!-- Alamat -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+            <textarea name="address" rows="2"
+                      placeholder="Alamat lengkap klinik"
+                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ data.address if data else '' }}</textarea>
+          </div>
+
+        </div>
+
+        <button type="submit"
+                class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
+          Daftarkan Klinik
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

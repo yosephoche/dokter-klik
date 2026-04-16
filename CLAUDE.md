@@ -216,6 +216,26 @@ Roles yang valid: `owner`, `doctor`, `admin`, `pharmacy`, `patient`. Enforce via
 
 ---
 
+## Definition of Done per Phase
+
+**Sebuah phase dinyatakan SELESAI hanya jika SEMUA kriteria berikut terpenuhi:**
+
+1. **End-user testable**: semua fitur dalam scope phase bisa diakses dan dicoba oleh end user klinik tanpa bantuan developer
+2. **Frontend tersambung**: semua `hx-get/post/patch` HTMX target mengembalikan HTML, bukan JSON. DRF views hanya boleh dipanggil langsung dari HTMX untuk aksi (POST/PATCH) yang tidak perlu merender HTML, bukan untuk memuat konten halaman
+3. **Auth flow lengkap**: alur login → gunakan fitur → logout bisa dilakukan end-to-end di browser tanpa error
+4. **Auth guard**: setiap web route (bukan public endpoint) memiliki `LoginRequiredMixin` atau equivalent — tidak ada halaman yang bisa diakses tanpa login
+5. **Jinja2 complete**: semua filter dan globals yang digunakan di template sudah terdaftar di `apps/core/jinja2.py`. Cek ulang sebelum menyatakan selesai
+6. **Browser smoke test**: setiap halaman dibuka di browser nyata, tidak ada HTTP 500, tidak ada JSON ditampilkan sebagai plain text, tidak ada `NoReverseMatch` error
+7. **Role-based access**: minimal dua role berbeda (misal: `owner` dan `doctor`) dicoba login dan memverifikasi menu serta data yang tampil sesuai dengan hak akses masing-masing
+
+**Checklist wajib sebelum merge ke main:**
+- [ ] `python manage.py check` tidak menghasilkan error
+- [ ] Semua URL names yang digunakan di template ter-resolve (tidak ada `NoReverseMatch`)
+- [ ] Login page bisa diakses dan form berfungsi
+- [ ] Halaman utama setiap fitur phase bisa dibuka dan menampilkan data (bukan pesan error)
+
+---
+
 ## Running the Project
 
 ```bash

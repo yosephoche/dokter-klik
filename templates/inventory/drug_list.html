@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Inventori Obat — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Inventori Obat</h1>
+</div>
+
+<div class="mb-4">
+  <input type="search"
+         name="q"
+         placeholder="Cari nama obat atau generik..."
+         class="w-full md:w-96 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+         hx-get="{{ url('drug-list-partial') }}"
+         hx-trigger="input changed delay:300ms, search"
+         hx-target="#drug-list"
+         hx-swap="innerHTML"
+         hx-include="this">
+</div>
+
+<div id="drug-list"
+     hx-get="{{ url('drug-list-partial') }}"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+  <p class="text-gray-400">Memuat inventori...</p>
+</div>
+{% endblock %}

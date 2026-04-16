@@ -1,0 +1,71 @@
+{% if entries %}
+  <div class="space-y-2" id="queue-rows">
+    {% for entry in entries %}
+    <div class="flex items-center gap-3 bg-white rounded-lg border px-4 py-3 text-sm">
+      <!-- Queue number -->
+      <span class="text-2xl font-bold text-blue-700 w-12 text-center">{{ entry.queue_number }}</span>
+
+      <!-- Patient info -->
+      <div class="flex-1 min-w-0">
+        <p class="font-medium truncate">
+          {{ entry.patient.name_search|title if entry.patient else 'Pasien tidak terdaftar' }}
+        </p>
+        <p class="text-xs text-gray-500">
+          {{ entry.source|title }}
+          {% if entry.doctor %} · Dr. {{ entry.doctor.full_name }}{% endif %}
+        </p>
+      </div>
+
+      <!-- Status badge -->
+      <span class="px-2 py-1 rounded-full text-xs font-medium
+        {% if entry.status == 'waiting' %}bg-yellow-100 text-yellow-800
+        {% elif entry.status == 'called' %}bg-blue-100 text-blue-800
+        {% elif entry.status == 'serving' %}bg-green-100 text-green-800
+        {% elif entry.status == 'done' %}bg-gray-100 text-gray-600
+        {% else %}bg-red-100 text-red-700{% endif %}">
+        {% if entry.status == 'waiting' %}Menunggu
+        {% elif entry.status == 'called' %}Dipanggil
+        {% elif entry.status == 'serving' %}Dilayani
+        {% elif entry.status == 'done' %}Selesai
+        {% else %}Dilewati{% endif %}
+      </span>
+
+      <!-- Action buttons -->
+      <div class="flex gap-2">
+        {% if entry.status == 'waiting' %}
+          <button class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700"
+                  hx-patch="{{ url('queue-call', args=[entry.id]) }}"
+                  hx-vals='{"status": "called"}'
+                  hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
+            Panggil
+          </button>
+          <button class="bg-red-100 text-red-700 text-xs px-3 py-1 rounded hover:bg-red-200"
+                  hx-patch="{{ url('queue-call', args=[entry.id]) }}"
+                  hx-vals='{"status": "skipped"}'
+                  hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
+            Lewati
+          </button>
+        {% elif entry.status == 'called' %}
+          <button class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700"
+                  hx-patch="{{ url('queue-call', args=[entry.id]) }}"
+                  hx-vals='{"status": "serving"}'
+                  hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
+            Layani
+          </button>
+        {% elif entry.status == 'serving' %}
+          <button class="bg-gray-600 text-white text-xs px-3 py-1 rounded hover:bg-gray-700"
+                  hx-patch="{{ url('queue-call', args=[entry.id]) }}"
+                  hx-vals='{"status": "done"}'
+                  hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
+            Selesai
+          </button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-12 text-gray-400">
+    <p class="text-lg">Belum ada antrean hari ini.</p>
+  </div>
+{% endif %}

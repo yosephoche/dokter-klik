@@ -1,0 +1,12 @@
+{% if results %}
+  {% for item in results %}
+  <div class="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b last:border-0 text-sm"
+       data-code="{{ item.code }}"
+       data-desc="{{ item.description_id if lang == 'id' else item.description_en }}">
+    <span class="font-mono font-bold text-blue-700 mr-2">{{ item.code }}</span>
+    <span class="text-gray-700">{{ item.description_id or item.description_en }}</span>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="px-3 py-2 text-sm text-gray-400">Tidak ada hasil ditemukan.</div>
+{% endif %}

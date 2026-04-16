@@ -90,7 +90,7 @@
                id="icd10-search"
                placeholder="Ketik nama penyakit atau kode ICD-10 (min 2 karakter)..."
                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-               hx-get="{{ url('icd10-search') }}"
+               hx-get="{{ url('icd10-search-partial') }}"
                hx-trigger="input changed delay:300ms"
                hx-target="#icd10-results"
                hx-swap="innerHTML"

@@ -1,0 +1,48 @@
+{% if patients %}
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b text-left text-gray-500">
+        <th class="pb-2 pr-4">No. RM</th>
+        <th class="pb-2 pr-4">Nama</th>
+        <th class="pb-2 pr-4">Tgl Lahir</th>
+        <th class="pb-2 pr-4">Jenis Kelamin</th>
+        <th class="pb-2 pr-4">Telepon</th>
+        <th class="pb-2">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for patient in patients %}
+      <tr class="border-b hover:bg-gray-50 cursor-pointer"
+          data-patient-id="{{ patient.id }}"
+          data-patient-name="{{ patient.name_search|title }}">
+        <td class="py-2 pr-4 font-mono text-xs text-gray-600">{{ patient.medical_record_number }}</td>
+        <td class="py-2 pr-4 font-medium">{{ patient.name_search|title }}</td>
+        <td class="py-2 pr-4 text-gray-600">
+          {{ patient.dob|datetimeformat('%d %b %Y') if patient.dob else '—' }}
+        </td>
+        <td class="py-2 pr-4 text-gray-600">
+          {% if patient.gender == 'male' %}Laki-laki
+          {% elif patient.gender == 'female' %}Perempuan
+          {% else %}—{% endif %}
+        </td>
+        <td class="py-2 pr-4 text-gray-600">{{ patient.phone or '—' }}</td>
+        <td class="py-2 flex gap-3">
+          <a href="{{ url('visit-list-web') }}?patient={{ patient.id }}"
+             class="text-blue-600 hover:underline text-xs">Riwayat</a>
+          <button class="text-green-600 hover:underline text-xs bg-transparent border-0 p-0 cursor-pointer"
+                  hx-post="{{ url('visit-create') }}"
+                  hx-vals='{"patient_id": "{{ patient.id }}"}'
+                  hx-target="body"
+                  hx-push-url="true">
+            + Kunjungan
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="text-center py-10 text-gray-400">
+    <p>Tidak ada pasien ditemukan.</p>
+  </div>
+{% endif %}

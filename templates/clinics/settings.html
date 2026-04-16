@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Pengaturan Klinik — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <h1 class="text-xl font-bold">Pengaturan Klinik</h1>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <form method="post" action="{{ url('clinic-settings') }}">
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
+
+      <div class="space-y-4">
+
+        <!-- Nama Klinik -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Nama Klinik <span class="text-red-500">*</span>
+          </label>
+          <input type="text" name="name" required
+                 value="{{ (data.name if data else None) or clinic.name }}"
+                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                        {{ 'border-red-400' if errors.name else 'border-gray-300' }}">
+          {% if errors.name %}
+            <p class="text-red-500 text-xs mt-1">{{ errors.name }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Telepon -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
+          <input type="text" name="phone"
+                 value="{{ (data.phone if data else None) or clinic.phone }}"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email Klinik</label>
+          <input type="email" name="email"
+                 value="{{ (data.email if data else None) or clinic.email }}"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Alamat -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+          <textarea name="address" rows="3"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ (data.address if data else None) or clinic.address }}</textarea>
+        </div>
+
+        <!-- Biaya Konsultasi -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Biaya Konsultasi (Rp)</label>
+          <input type="number" name="consultation_fee" min="0" step="1000"
+                 value="{{ (data.consultation_fee if data else None) or clinic.consultation_fee }}"
+                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                        {{ 'border-red-400' if errors.consultation_fee else 'border-gray-300' }}">
+          {% if errors.consultation_fee %}
+            <p class="text-red-500 text-xs mt-1">{{ errors.consultation_fee }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
+          Simpan Perubahan
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

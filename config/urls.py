@@ -20,9 +20,17 @@ urlpatterns = [
     path('api/dashboard/', include('apps.dashboard.urls')),
     # WhatsApp webhook
     path('webhooks/whatsapp/', include('apps.whatsapp.urls')),
-    # HTMX / browser views
-    path('queue/', include('apps.queue.urls')),
+    # Auth (browser/session)
+    path('auth/', include('apps.accounts.web_urls')),
+    # Web page views (browser/HTMX)
+    path('patients/', include('apps.patients.web_urls')),
+    path('visits/', include('apps.emr.web_urls')),
+    path('invoices/', include('apps.billing.web_urls')),
+    path('inventory/', include('apps.inventory.web_urls')),
+    path('queue/', include('apps.queue.urls')),       # public live display
+    path('queue/', include('apps.queue.web_urls')),   # management + partial
     path('clinics/', include('apps.clinics.urls')),
+    path('klinik/', include('apps.clinics.web_urls')),
     path('', include('apps.dashboard.web_urls')),
 ]
 

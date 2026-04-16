@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title>DokterKlik — Manajemen Klinik Cerdas Terintegrasi SATUSEHAT</title>
+  <meta name="description" content="Platform SaaS manajemen klinik untuk klinik pratama dan dokter praktik mandiri. EMR SOAP, integrasi SATUSEHAT, antrean real-time, billing terintegrasi.">
+  <script src="https://unpkg.com/htmx.org@1.9.12" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#172554',
+            },
+            emerald: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="{{ static('css/landing.css') }}">
+</head>
+<body class="bg-white text-gray-800 antialiased">
+
+  <!-- ============ NAVIGATION ============ -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 transition-shadow duration-300" id="main-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <a href="{{ url('landing') }}" class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </div>
+          <span class="text-xl font-bold text-brand-900">DokterKlik</span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+          <a href="#fitur" class="hover:text-brand-600 transition-colors">Fitur</a>
+          <a href="#satusehat" class="hover:text-brand-600 transition-colors">SATUSEHAT</a>
+          <a href="#harga" class="hover:text-brand-600 transition-colors">Harga</a>
+          <a href="#faq" class="hover:text-brand-600 transition-colors">FAQ</a>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="flex items-center gap-3">
+          <a href="{{ url('auth-login-web') }}" class="hidden sm:inline-flex text-sm font-medium text-gray-700 hover:text-brand-600 transition-colors px-3 py-2">
+            Masuk
+          </a>
+          <a href="{{ url('auth-login-web') }}" class="inline-flex items-center gap-1.5 bg-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-brand-700 transition-colors shadow-sm">
+            Coba Gratis
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </a>
+          <!-- Mobile menu toggle -->
+          <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="md:hidden hidden pb-4 border-t border-gray-100 mt-2 pt-4">
+        <div class="flex flex-col gap-3 text-sm font-medium text-gray-600">
+          <a href="#fitur" class="hover:text-brand-600 py-1">Fitur</a>
+          <a href="#satusehat" class="hover:text-brand-600 py-1">SATUSEHAT</a>
+          <a href="#harga" class="hover:text-brand-600 py-1">Harga</a>
+          <a href="#faq" class="hover:text-brand-600 py-1">FAQ</a>
+          <a href="{{ url('auth-login-web') }}" class="hover:text-brand-600 py-1">Masuk</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============ HERO SECTION ============ -->
+  <section class="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 bg-gradient-to-br from-brand-50 via-white to-emerald-50"></div>
+    <div class="absolute top-20 right-0 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute top-40 left-0 w-96 h-96 bg-emerald-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Text Content -->
+        <div class="text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            Terintegrasi SATUSEHAT — PMK No. 24/2022
+          </div>
+
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight">
+            Manajemen Klinik
+            <span class="text-brand-600 block">Cerdas & Terintegrasi</span>
+          </h1>
+
+          <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            Pangkas waktu administratif hingga <strong class="text-gray-900">60%</strong>. Fokus ke pasien, biar urusan digital serahkan ke DokterKlik.
+          </p>
+
+          <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <a href="{{ url('auth-login-web') }}" class="inline-flex items-center justify-center gap-2 bg-brand-600 text-white font-semibold px-8 py-3.5 rounded-xl hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/25 hover:shadow-xl hover:shadow-brand-600/30 hover:-translate-y-0.5">
+              Mulai Gratis Sekarang
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </a>
+            <a href="#fitur" class="inline-flex items-center justify-center gap-2 bg-white text-gray-700 font-semibold px-8 py-3.5 rounded-xl border border-gray-200 hover:border-brand-300 hover:text-brand-600 transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Lihat Fitur
+            </a>
+          </div>
+
+          <!-- Trust badges -->
+          <div class="mt-10 flex flex-wrap items-center gap-6 justify-center lg:justify-start text-sm text-gray-500">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span>Gratis 30 hari</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span>Tanpa kartu kredit</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span>Data aman di Indonesia</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Illustration — Dashboard Mockup -->
+        <div class="relative hidden lg:block">
+          <div class="relative bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+            <!-- Fake browser bar -->
+            <div class="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center gap-2">
+              <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+              </div>
+              <div class="flex-1 bg-white rounded-md px-3 py-1 text-xs text-gray-400 border border-gray-200 ml-2">
+                app.dokterklik.id/dashboard
+              </div>
+            </div>
+            <!-- Dashboard mockup content -->
+            <div class="p-6 space-y-4">
+              <!-- Stats Row -->
+              <div class="grid grid-cols-3 gap-3">
+                <div class="bg-brand-50 rounded-lg p-3">
+                  <div class="text-xs text-brand-600 font-medium">Pasien Hari Ini</div>
+                  <div class="text-2xl font-bold text-brand-900 mt-1">24</div>
+                </div>
+                <div class="bg-emerald-50 rounded-lg p-3">
+                  <div class="text-xs text-emerald-600 font-medium">Antrean Aktif</div>
+                  <div class="text-2xl font-bold text-emerald-700 mt-1">7</div>
+                </div>
+                <div class="bg-amber-50 rounded-lg p-3">
+                  <div class="text-xs text-amber-600 font-medium">Pendapatan</div>
+                  <div class="text-2xl font-bold text-amber-700 mt-1">3.6jt</div>
+                </div>
+              </div>
+              <!-- SOAP Form Preview -->
+              <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center text-white text-xs font-bold">SA</div>
+                  <div>
+                    <div class="text-sm font-semibold">Siti Aminah</div>
+                    <div class="text-xs text-gray-400">No. Antrean #12 · Dr. Budi</div>
+                  </div>
+                  <div class="ml-auto">
+                    <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">In Progress</span>
+                  </div>
+                </div>
+                <div class="flex gap-2 text-xs font-medium">
+                  <span class="px-3 py-1.5 bg-brand-600 text-white rounded-md">S</span>
+                  <span class="px-3 py-1.5 bg-gray-200 text-gray-600 rounded-md">O</span>
+                  <span class="px-3 py-1.5 bg-gray-200 text-gray-600 rounded-md">A</span>
+                  <span class="px-3 py-1.5 bg-gray-200 text-gray-600 rounded-md">P</span>
+                </div>
+                <div class="mt-3 text-xs text-gray-500 leading-relaxed">
+                  <strong class="text-gray-700">Subjective:</strong> Pasien datang dengan keluhan batuk pilek sejak 3 hari yang lalu, disertai demam ringan...
+                </div>
+              </div>
+              <!-- Sync status -->
+              <div class="flex items-center gap-2 text-xs">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                <span class="text-emerald-600 font-medium">SATUSEHAT tersinkronisasi</span>
+                <span class="text-gray-300 ml-auto">Auto-saved 5 detik lalu</span>
+              </div>
+            </div>
+          </div>
+          <!-- Floating card — WhatsApp notification -->
+          <div class="absolute -bottom-4 -left-8 bg-white rounded-xl shadow-lg border border-gray-100 p-3 flex items-center gap-3 animate-float">
+            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.553 4.12 1.52 5.856L.06 23.488l5.753-1.51A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82c-1.98 0-3.845-.55-5.46-1.563l-.39-.232-3.478.913.928-3.393-.254-.404A9.8 9.8 0 012.18 12c0-5.422 4.398-9.82 9.82-9.82 5.422 0 9.82 4.398 9.82 9.82 0 5.422-4.398 9.82-9.82 9.82z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-gray-800">Booking Baru!</div>
+              <div class="text-xs text-gray-500">Ahmad · 09:30 besok</div>
+            </div>
+          </div>
+          <!-- Floating card — SATUSEHAT sync -->
+          <div class="absolute -top-2 -right-4 bg-white rounded-xl shadow-lg border border-gray-100 p-3 animate-float animation-delay-1000">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                </svg>
+              </div>
+              <div>
+                <div class="text-xs font-semibold text-gray-800">FHIR R4 Synced</div>
+                <div class="text-xs text-emerald-500 font-medium">✓ Encounter #1247</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SOCIAL PROOF ============ -->
+  <section class="py-12 bg-gray-50 border-y border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-center text-sm font-medium text-gray-500 mb-8">Dipercaya oleh ratusan klinik di seluruh Indonesia</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+        <div class="text-center">
+          <div class="text-3xl font-extrabold text-brand-600">500+</div>
+          <div class="text-sm text-gray-500 mt-1">Klinik Terdaftar</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-extrabold text-brand-600">50rb+</div>
+          <div class="text-sm text-gray-500 mt-1">Rekam Medis Digital</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-extrabold text-brand-600">99.5%</div>
+          <div class="text-sm text-gray-500 mt-1">Uptime Server</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-extrabold text-brand-600">60%</div>
+          <div class="text-sm text-gray-500 mt-1">Waktu Administratif ↓</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAIN POINTS ============ -->
+  <section class="py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">
+          Apakah Klinik Anda Mengalami Ini?
+        </h2>
+        <p class="mt-4 text-lg text-gray-500">
+          Mayoritas klinik pratama di Indonesia masih menghadapi tantangan yang sama.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Pain 1 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 hover:border-red-200 hover:shadow-lg transition-all group">
+          <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Risiko Tidak Patuh Regulasi</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">PMK No. 24/2022 mewajibkan integrasi SATUSEHAT. Klinik tanpa sistem digital siap terkena sanksi.</p>
+        </div>
+        <!-- Pain 2 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 hover:border-red-200 hover:shadow-lg transition-all group">
+          <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Waktu Administratif Berlebih</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Dokter menghabiskan 30-40% waktu untuk tugas admin: menulis resep, menghitung tagihan, mencatat rekam medis.</p>
+        </div>
+        <!-- Pain 3 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 hover:border-red-200 hover:shadow-lg transition-all group">
+          <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Pengalaman Pasien Buruk</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Antrean panjang tanpa estimasi waktu, resep harus ditulis ulang, tidak ada akses riwayat kesehatan.</p>
+        </div>
+        <!-- Pain 4 -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 hover:border-red-200 hover:shadow-lg transition-all group">
+          <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Data Rentan Hilang</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Catatan kertas mudah rusak, hilang, atau sulit dilacak untuk keperluan audit dan kontinuitas perawatan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section id="fitur" class="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
+          Fitur Lengkap
+        </div>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">
+          Semua yang Klinik Anda Butuhkan
+        </h2>
+        <p class="mt-4 text-lg text-gray-500">
+          Satu platform terintegrasi untuk mengelola seluruh operasional klinik — dari pendaftaran hingga pelaporan.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1: Smart EMR -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-all group hover:-translate-y-1">
+          <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-600 transition-colors">
+            <svg class="w-7 h-7 text-brand-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Smart EMR (SOAP)</h3>
+          <p class="text-gray-500 leading-relaxed mb-4">Pencatatan rekam medis berbasis SOAP dengan template spesialisasi, auto-save 30 detik, dan auto-coding ICD-10 otomatis.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              5+ template spesialisasi
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Pencarian ICD-10 real-time
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Riwayat kunjungan pasien
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 2: Antrean Real-time -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-all group hover:-translate-y-1">
+          <div class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-500 transition-colors">
+            <svg class="w-7 h-7 text-emerald-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Antrean Real-Time</h3>
+          <p class="text-gray-500 leading-relaxed mb-4">Sistem antrean digital dengan layar TV klinik dan notifikasi otomatis ke pasien saat nomor antrean mendekati.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Layar antrean TV klinik
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Notifikasi WhatsApp otomatis
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Manajemen multi-dokter
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 3: Billing -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-all group hover:-translate-y-1">
+          <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-500 transition-colors">
+            <svg class="w-7 h-7 text-amber-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Billing Terintegrasi</h3>
+          <p class="text-gray-500 leading-relaxed mb-4">Tagihan otomatis dihitung dari data EMR: konsultasi + tindakan + obat. Bayar via QRIS & Virtual Account.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Midtrans: QRIS + VA
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Invoice via WhatsApp/PDF
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Laporan keuangan otomatis
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 4: WhatsApp -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-all group hover:-translate-y-1">
+          <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-500 transition-colors">
+            <svg class="w-7 h-7 text-green-600 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Booking via WhatsApp</h3>
+          <p class="text-gray-500 leading-relaxed mb-4">Pasien bisa booking, cek antrean, dan terima resep digital langsung dari WhatsApp — tanpa download aplikasi.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Chatbot booking otomatis
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Pengingat kontrol H-1
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              E-Prescription via chat
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 5: Inventory -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-all group hover:-translate-y-1">
+          <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-500 transition-colors">
+            <svg class="w-7 h-7 text-purple-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Inventori Apotek</h3>
+          <p class="text-gray-500 leading-relaxed mb-4">Kelola stok obat, dapatkan peringatan otomatis saat stok menipis, dan cetak label obat langsung dari sistem.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Alert stok menipis
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Manajemen batch & expired
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Integrasi dengan resep dokter
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feature 6: Dashboard Analytics -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl transition-all group hover:-translate-y-1">
+          <div class="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-500 transition-colors">
+            <svg class="w-7 h-7 text-indigo-600 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Dashboard Analytics</h3>
+          <p class="text-gray-500 leading-relaxed mb-4">Pantau performa klinik secara real-time: jumlah pasien, pendapatan, diagnosis terbanyak, dan tren kunjungan.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Grafik & chart interaktif
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Export PDF & CSV
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              Laporan berkala otomatis
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SATUSEHAT SECTION ============ -->
+  <section id="satusehat" class="py-16 md:py-24 bg-brand-950 text-white relative overflow-hidden">
+    <!-- Background pattern -->
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute inset-0" style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Text Content -->
+        <div>
+          <div class="inline-flex items-center gap-2 bg-brand-800 text-brand-200 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            Kepatuhan Regulasi
+          </div>
+
+          <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
+            Integrasi Resmi<br>
+            <span class="text-brand-300">SATUSEHAT Kemenkes</span>
+          </h2>
+
+          <p class="mt-6 text-lg text-brand-200 leading-relaxed">
+            Sesuai amanat <strong class="text-white">PMK No. 24 Tahun 2022</strong>, seluruh fasilitas kesehatan wajib mengintegrasikan data ke SATUSEHAT. DokterKlik melakukannya secara otomatis untuk Anda.
+          </p>
+
+          <div class="mt-8 space-y-4">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-brand-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div>
+                <div class="font-semibold text-white">Sinkronisasi Otomatis via FHIR R4</div>
+                <div class="text-sm text-brand-300 mt-1">Data Patient, Encounter, Condition, Observation, dan MedicationRequest dikirim otomatis setelah dokter simpan SOAP.</div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-brand-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div>
+                <div class="font-semibold text-white">Validasi ICD-10 Otomatis</div>
+                <div class="text-sm text-brand-300 mt-1">Kode diagnosis divalidasi sesuai standar internasional sebelum dikirim ke SATUSEHAT.</div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-brand-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div>
+                <div class="font-semibold text-white">Retry & Monitoring</div>
+                <div class="text-sm text-brand-300 mt-1">Jika gagal sync, sistem otomatis retry hingga 5× dengan exponential backoff. Failure rate > 10% langsung alert ke admin.</div>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 bg-brand-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div>
+                <div class="font-semibold text-white">OAuth 2.0 & Enkripsi End-to-End</div>
+                <div class="text-sm text-brand-300 mt-1">Autentikasi aman menggunakan Client Credentials. Token dan data medis dienkripsi menggunakan Fernet (AES-128).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sync Flow Diagram -->
+        <div class="hidden lg:block">
+          <div class="bg-brand-900/50 backdrop-blur-sm rounded-2xl border border-brand-800 p-8">
+            <div class="text-sm font-semibold text-brand-300 mb-6">Alur Sinkronisasi SATUSEHAT</div>
+            <div class="space-y-4">
+              <!-- Step 1 -->
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">1</div>
+                <div class="flex-1 bg-brand-800 rounded-lg p-3">
+                  <div class="text-sm font-medium text-white">Dokter Simpan SOAP</div>
+                  <div class="text-xs text-brand-400 mt-0.5">Data kunjungan, diagnosis, dan resep terekam</div>
+                </div>
+              </div>
+              <div class="flex justify-center">
+                <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+              </div>
+              <!-- Step 2 -->
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">2</div>
+                <div class="flex-1 bg-brand-800 rounded-lg p-3">
+                  <div class="text-sm font-medium text-white">Validasi FHIR R4</div>
+                  <div class="text-xs text-brand-400 mt-0.5">Data divalidasi sesuai standar HL7 FHIR</div>
+                </div>
+              </div>
+              <div class="flex justify-center">
+                <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+              </div>
+              <!-- Step 3 -->
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">3</div>
+                <div class="flex-1 bg-brand-800 rounded-lg p-3">
+                  <div class="text-sm font-medium text-white">Celery Task → API SATUSEHAT</div>
+                  <div class="text-xs text-brand-400 mt-0.5">Async queue dengan retry exponential backoff</div>
+                </div>
+              </div>
+              <div class="flex justify-center">
+                <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+              </div>
+              <!-- Step 4 -->
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div class="flex-1 bg-emerald-900/50 border border-emerald-700 rounded-lg p-3">
+                  <div class="text-sm font-medium text-emerald-300">Sync Berhasil ✓</div>
+                  <div class="text-xs text-emerald-400 mt-0.5">Tercatat di SyncLog — retensi 5 tahun</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECURITY ============ -->
+  <section class="py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">
+          Keamanan Data Terjamin
+        </h2>
+        <p class="mt-4 text-lg text-gray-500">
+          Mematuhi UU PDP No. 27/2022 dan standar keamanan data kesehatan terbaik.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="text-center p-6">
+          <div class="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Enkripsi Fernet (AES)</h3>
+          <p class="text-sm text-gray-500">Data medis dan PII dienkripsi at-rest dengan Fernet symmetric encryption.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Hosting Indonesia</h3>
+          <p class="text-sm text-gray-500">Data disimpan di data center Indonesia sesuai regulasi UU PDP.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">Audit Log Lengkap</h3>
+          <p class="text-sm text-gray-500">Setiap akses data medis dicatat: siapa, kapan, dan data apa yang diakses.</p>
+        </div>
+        <div class="text-center p-6">
+          <div class="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+            </svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-2">TLS 1.3 & MFA</h3>
+          <p class="text-sm text-gray-500">Enkripsi in-transit wajib HTTPS. MFA opsional untuk akun dokter dan admin.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section id="harga" class="py-16 md:py-24 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 bg-brand-100 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
+          Harga Transparan
+        </div>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">
+          Pilih Paket Sesuai Kebutuhan
+        </h2>
+        <p class="mt-4 text-lg text-gray-500">
+          Mulai gratis, upgrade kapan saja. Tanpa biaya tersembunyi.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <!-- Starter -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
+          <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Starter</div>
+          <div class="mt-4 flex items-baseline">
+            <span class="text-4xl font-extrabold text-gray-900">Gratis</span>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Sempurna untuk dokter praktik mandiri yang baru memulai digitalisasi.</p>
+
+          <div class="mt-8 flex-1">
+            <ul class="space-y-3 text-sm text-gray-600">
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                1 dokter
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                EMR SOAP + template dasar
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Integrasi SATUSEHAT
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Antrean real-time
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                100 rekam medis/bulan
+              </li>
+            </ul>
+          </div>
+
+          <a href="{{ url('auth-login-web') }}" class="mt-8 block text-center bg-white text-gray-700 font-semibold px-6 py-3 rounded-xl border-2 border-gray-200 hover:border-brand-300 hover:text-brand-600 transition-all">
+            Mulai Gratis
+          </a>
+        </div>
+
+        <!-- Pro (Highlighted) -->
+        <div class="bg-white rounded-2xl p-8 border-2 border-brand-600 shadow-xl relative flex flex-col">
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
+            Paling Populer
+          </div>
+          <div class="text-sm font-semibold text-brand-600 uppercase tracking-wider">Pro</div>
+          <div class="mt-4 flex items-baseline">
+            <span class="text-4xl font-extrabold text-gray-900">Rp 150rb</span>
+            <span class="text-sm text-gray-500 ml-1">/bulan</span>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Untuk klinik pratama yang ingin operasional penuh secara digital.</p>
+
+          <div class="mt-8 flex-1">
+            <ul class="space-y-3 text-sm text-gray-600">
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Hingga 3 dokter
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Semua fitur Starter
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Billing + Midtrans (QRIS/VA)
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                WhatsApp booking & notifikasi
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Inventori apotek mini
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Unlimited rekam medis
+              </li>
+            </ul>
+          </div>
+
+          <a href="{{ url('auth-login-web') }}" class="mt-8 block text-center bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-brand-700 transition-colors shadow-lg shadow-brand-600/25">
+            Coba Pro Gratis 30 Hari
+          </a>
+        </div>
+
+        <!-- Plus -->
+        <div class="bg-white rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col">
+          <div class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Plus</div>
+          <div class="mt-4 flex items-baseline">
+            <span class="text-4xl font-extrabold text-gray-900">Rp 300rb</span>
+            <span class="text-sm text-gray-500 ml-1">/bulan</span>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Untuk klinik berskala dengan kebutuhan analitik dan dukungan prioritas.</p>
+
+          <div class="mt-8 flex-1">
+            <ul class="space-y-3 text-sm text-gray-600">
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Hingga 10 dokter
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Semua fitur Pro
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Dashboard analytics lengkap
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                E-Prescription
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Pengingat kontrol otomatis
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Priority support 24/7
+              </li>
+            </ul>
+          </div>
+
+          <a href="{{ url('auth-login-web') }}" class="mt-8 block text-center bg-white text-gray-700 font-semibold px-6 py-3 rounded-xl border-2 border-gray-200 hover:border-brand-300 hover:text-brand-600 transition-all">
+            Pilih Plus
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq" class="py-16 md:py-24">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">
+          Pertanyaan yang Sering Diajukan
+        </h2>
+      </div>
+
+      <div class="space-y-4" id="faq-container">
+        <!-- FAQ 1 -->
+        <div class="faq-item border border-gray-200 rounded-xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900 pr-4">Apakah DokterKlik benar-benar terintegrasi dengan SATUSEHAT?</span>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 faq-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5">
+            <p class="text-gray-600 text-sm leading-relaxed">Ya, DokterKlik menggunakan standar HL7 FHIR R4 untuk berkomunikasi langsung dengan API SATUSEHAT Kemenkes. Setiap data rekam medis yang disimpan oleh dokter otomatis disinkronkan — termasuk data Patient, Encounter, Condition, Observation, dan MedicationRequest. Sistem juga memiliki retry mechanism untuk memastikan tidak ada data yang terlewat.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="faq-item border border-gray-200 rounded-xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900 pr-4">Apakah data pasien aman?</span>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 faq-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5">
+            <p class="text-gray-600 text-sm leading-relaxed">Keamanan data adalah prioritas utama kami. Semua data medis dan PII (seperti NIK) dienkripsi menggunakan Fernet (AES-128) saat disimpan di database. Transfer data dilakukan melalui HTTPS/TLS 1.3. Data disimpan di data center Indonesia, mematuhi UU PDP No. 27/2022. Kami juga mencatat audit log untuk setiap akses data medis.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="faq-item border border-gray-200 rounded-xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900 pr-4">Apakah perlu instalasi atau bisa langsung pakai?</span>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 faq-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5">
+            <p class="text-gray-600 text-sm leading-relaxed">DokterKlik adalah aplikasi berbasis web (SaaS), jadi Anda tidak perlu menginstal apa pun. Cukup buka browser di komputer, tablet, atau smartphone, login, dan langsung bisa digunakan. Kami merekomendasikan browser Chrome, Firefox, Safari, atau Edge versi terbaru.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="faq-item border border-gray-200 rounded-xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900 pr-4">Bagaimana pasien bisa booking via WhatsApp?</span>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 faq-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5">
+            <p class="text-gray-600 text-sm leading-relaxed">Pasien cukup mengirim pesan ke nomor WhatsApp klinik yang sudah terhubung dengan DokterKlik. Chatbot otomatis kami akan memandu pasien untuk memilih dokter, tanggal, dan jam kunjungan. Pasien juga bisa menerima notifikasi antrean, pengingat kontrol, dan resep digital langsung di WhatsApp.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="faq-item border border-gray-200 rounded-xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900 pr-4">Berapa lama onboarding dan setup klinik?</span>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 faq-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5">
+            <p class="text-gray-600 text-sm leading-relaxed">Proses setup awal hanya membutuhkan waktu 15-30 menit. Anda cukup mendaftar, mengisi profil klinik, menambahkan dokter dan staf, lalu langsung bisa mulai melayani pasien. Tim kami juga tersedia untuk membantu proses onboarding jika diperlukan.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 6 -->
+        <div class="faq-item border border-gray-200 rounded-xl overflow-hidden">
+          <button onclick="toggleFaq(this)" class="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors">
+            <span class="font-semibold text-gray-900 pr-4">Apakah bisa upgrade atau downgrade paket kapan saja?</span>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 faq-chevron transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+          <div class="faq-answer hidden px-5 pb-5">
+            <p class="text-gray-600 text-sm leading-relaxed">Tentu. Anda bisa upgrade atau downgrade paket kapan saja melalui halaman pengaturan klinik. Perubahan akan berlaku di siklus billing berikutnya. Tidak ada penalti atau biaya tambahan untuk perubahan paket.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="py-16 md:py-24 bg-brand-600 relative overflow-hidden">
+    <!-- Background decoration -->
+    <div class="absolute inset-0">
+      <div class="absolute top-0 left-1/4 w-72 h-72 bg-brand-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+      <div class="absolute bottom-0 right-1/4 w-72 h-72 bg-brand-700 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+    </div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+        Siap Digitalisasi Klinik Anda?
+      </h2>
+      <p class="mt-6 text-lg text-brand-100 max-w-2xl mx-auto">
+        Bergabung dengan ratusan klinik yang sudah menggunakan DokterKlik. Mulai gratis hari ini — tanpa kartu kredit, tanpa komitmen.
+      </p>
+      <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="{{ url('auth-login-web') }}" class="inline-flex items-center justify-center gap-2 bg-white text-brand-700 font-bold px-8 py-4 rounded-xl hover:bg-brand-50 transition-colors shadow-xl text-lg">
+          Daftar Gratis Sekarang
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </a>
+        <a href="#fitur" class="inline-flex items-center justify-center gap-2 bg-brand-700 text-white font-semibold px-8 py-4 rounded-xl hover:bg-brand-800 transition-colors border border-brand-500">
+          Pelajari Lebih Lanjut
+        </a>
+      </div>
+      <p class="mt-6 text-sm text-brand-200">
+        Setup hanya 15 menit · Tanpa instalasi · Dukungan tim kami siap membantu
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="bg-gray-900 text-gray-400 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-4 gap-8">
+        <!-- Brand -->
+        <div class="md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </div>
+            <span class="text-xl font-bold text-white">DokterKlik</span>
+          </div>
+          <p class="text-sm leading-relaxed">
+            Platform SaaS manajemen klinik cerdas terintegrasi SATUSEHAT untuk klinik pratama dan dokter praktik mandiri di Indonesia.
+          </p>
+        </div>
+
+        <!-- Product -->
+        <div>
+          <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Produk</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#fitur" class="hover:text-white transition-colors">Fitur</a></li>
+            <li><a href="#harga" class="hover:text-white transition-colors">Harga</a></li>
+            <li><a href="#satusehat" class="hover:text-white transition-colors">Integrasi SATUSEHAT</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Changelog</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div>
+          <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Sumber Daya</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">Dokumentasi</a></li>
+            <li><a href="#faq" class="hover:text-white transition-colors">FAQ</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Panduan SATUSEHAT</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact -->
+        <div>
+          <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Hubungi Kami</h4>
+          <ul class="space-y-2 text-sm">
+            <li>
+              <a href="mailto:hello@dokterklik.id" class="hover:text-white transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                hello@dokterklik.id
+              </a>
+            </li>
+            <li>
+              <a href="#" class="hover:text-white transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                </svg>
+                WhatsApp Kami
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-800 mt-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-sm">&copy; 2025 DokterKlik. Hak cipta dilindungi undang-undang.</p>
+        <div class="flex items-center gap-6 text-sm">
+          <a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a>
+          <a href="#" class="hover:text-white transition-colors">Syarat & Ketentuan</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ SCRIPTS ============ -->
+  <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu when clicking a link
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+      });
+    });
+
+    // Navbar shadow on scroll
+    const nav = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 10) {
+        nav.classList.add('shadow-md');
+      } else {
+        nav.classList.remove('shadow-md');
+      }
+    });
+
+    // FAQ accordion
+    function toggleFaq(button) {
+      const faqItem = button.parentElement;
+      const answer = faqItem.querySelector('.faq-answer');
+      const chevron = button.querySelector('.faq-chevron');
+      const isOpen = !answer.classList.contains('hidden');
+
+      // Close all FAQ items
+      document.querySelectorAll('.faq-answer').forEach(a => a.classList.add('hidden'));
+      document.querySelectorAll('.faq-chevron').forEach(c => c.style.transform = 'rotate(0deg)');
+
+      // Toggle current item
+      if (!isOpen) {
+        answer.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          const navHeight = nav.offsetHeight;
+          const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
+          window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

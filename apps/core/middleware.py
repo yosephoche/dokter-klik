@@ -1,4 +1,4 @@
-"""Core middleware: audit logging and session timeout."""
+"""Core middleware: audit logging, session timeout, and clinic onboarding guard."""
 import time
 import logging
 from django.conf import settings
@@ -6,6 +6,37 @@ from django.utils import timezone
 from django.shortcuts import redirect
 
 logger = logging.getLogger(__name__)
+
+_ONBOARDING_EXEMPT = [
+    '/auth/',
+    '/admin/',
+    '/klinik/onboarding/',
+    '/api/',
+    '/static/',
+    '/queue/live/',
+    '/webhooks/',
+]
+
+
+class ClinicOnboardingMiddleware:
+    """
+    Redirect authenticated non-superuser users without a clinic to the onboarding page.
+    This prevents cryptic IntegrityErrors and guides new users to set up their clinic.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if (
+            hasattr(request, 'user')
+            and request.user.is_authenticated
+            and not request.user.is_superuser
+            and not request.user.clinic_id
+            and not any(request.path.startswith(p) for p in _ONBOARDING_EXEMPT)
+        ):
+            return redirect('/klinik/onboarding/')
+        return self.get_response(request)
 
 
 class AuditLogMiddleware:
@@ -72,6 +103,6 @@ class SessionTimeoutMiddleware:
                         {'detail': 'Session expired. Please login again.'},
                         status=401
                     )
-                return redirect('/api/auth/login/')
+                return redirect('/auth/login/')
             request.session['last_activity'] = now
         return self.get_response(request)

@@ -5,10 +5,12 @@
 {% block content %}
 <div class="flex items-center justify-between mb-6">
   <h1 class="text-2xl font-bold">Daftar Pasien</h1>
-  <a href="{{ url('patient-list') }}?action=new"
-     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+  {% if request.user.role in ('admin', 'owner') %}
+  <a href="{{ url('patient-create') }}"
+     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
     + Pasien Baru
   </a>
+  {% endif %}
 </div>
 
 <!-- Search bar with HTMX -->
@@ -17,7 +19,7 @@
          name="q"
          placeholder="Cari nama atau nomor RM..."
          class="w-full md:w-96 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-         hx-get="{{ url('patient-list') }}"
+         hx-get="{{ url('patient-list-partial') }}"
          hx-trigger="input changed delay:300ms, search"
          hx-target="#patient-list"
          hx-swap="innerHTML"
@@ -26,7 +28,7 @@
 
 <!-- Patient list (HTMX target) -->
 <div id="patient-list"
-     hx-get="{{ url('patient-list') }}"
+     hx-get="{{ url('patient-list-partial') }}"
      hx-trigger="load"
      hx-swap="innerHTML">
   <p class="text-gray-400">Memuat...</p>

@@ -18,25 +18,34 @@
     <div class="flex items-center gap-4 text-sm">
       {% if request.user.is_authenticated %}
         {% if request.user.role in ('admin', 'owner') %}
-          <a href="{{ url('patient-list') }}" class="hover:underline">Pasien</a>
-          <a href="{{ url('queue-list') }}" class="hover:underline">Antrean</a>
-          <a href="{{ url('invoice-list') }}" class="hover:underline">Billing</a>
+          <a href="{{ url('patient-list-web') }}" class="hover:underline">Pasien</a>
+          <a href="{{ url('queue-manage-web') }}" class="hover:underline">Antrean</a>
+          <a href="{{ url('invoice-list-web') }}" class="hover:underline">Billing</a>
         {% endif %}
         {% if request.user.role in ('doctor',) %}
-          <a href="{{ url('visit-list') }}" class="hover:underline">Kunjungan</a>
+          <a href="{{ url('visit-list-web') }}" class="hover:underline">Kunjungan</a>
         {% endif %}
         {% if request.user.role in ('pharmacy', 'admin', 'owner') %}
-          <a href="{{ url('drug-list') }}" class="hover:underline">Inventori</a>
+          <a href="{{ url('drug-list-web') }}" class="hover:underline">Inventori</a>
+        {% endif %}
+        {% if request.user.role == 'owner' %}
+          <a href="{{ url('clinic-settings') }}" class="hover:underline">Klinik</a>
+          <a href="{{ url('clinic-users') }}" class="hover:underline">Pengguna</a>
         {% endif %}
         <span class="opacity-75">{{ request.user.full_name }}</span>
-        <a href="{{ url('auth-logout') }}" class="bg-blue-900 px-3 py-1 rounded hover:bg-blue-800">Keluar</a>
+        <form method="post" action="{{ url('auth-logout-web') }}" class="inline">
+          <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
+          <button type="submit" class="bg-blue-900 px-3 py-1 rounded hover:bg-blue-800 cursor-pointer border-0">
+            Keluar
+          </button>
+        </form>
       {% endif %}
     </div>
   </nav>
 
   <!-- Flash messages -->
   <div id="messages" class="container mx-auto px-4 mt-2">
-    {% for message in messages %}
+    {% for message in get_messages(request) %}
       <div class="p-3 mb-2 rounded text-sm
         {% if message.tags == 'error' %}bg-red-100 text-red-800
         {% elif message.tags == 'success' %}bg-green-100 text-green-800

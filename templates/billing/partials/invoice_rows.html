@@ -1,0 +1,44 @@
+{% if invoices %}
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b text-left text-gray-500">
+        <th class="pb-2 pr-4">No. Invoice</th>
+        <th class="pb-2 pr-4">Pasien</th>
+        <th class="pb-2 pr-4">Tanggal</th>
+        <th class="pb-2 pr-4">Total</th>
+        <th class="pb-2 pr-4">Status</th>
+        <th class="pb-2">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for invoice in invoices %}
+      <tr class="border-b hover:bg-gray-50">
+        <td class="py-2 pr-4 font-mono text-xs text-gray-600">{{ invoice.invoice_number }}</td>
+        <td class="py-2 pr-4 font-medium">
+          {{ invoice.visit.patient.name_search|title }}
+        </td>
+        <td class="py-2 pr-4 text-gray-600">{{ invoice.created_at|datetimeformat }}</td>
+        <td class="py-2 pr-4 font-medium">Rp {{ "{:,.0f}".format(invoice.grand_total) }}</td>
+        <td class="py-2 pr-4">
+          <span class="px-2 py-0.5 rounded-full text-xs font-medium
+            {% if invoice.payment_status == 'paid' %}bg-green-100 text-green-800
+            {% elif invoice.payment_status == 'cancelled' %}bg-red-100 text-red-700
+            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+            {% if invoice.payment_status == 'paid' %}Lunas
+            {% elif invoice.payment_status == 'cancelled' %}Batal
+            {% else %}Belum Bayar{% endif %}
+          </span>
+        </td>
+        <td class="py-2">
+          <a href="{{ url('invoice-detail-web', args=[invoice.id]) }}"
+             class="text-blue-600 hover:underline text-xs">Detail</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <div class="text-center py-10 text-gray-400">
+    <p>Belum ada invoice.</p>
+  </div>
+{% endif %}

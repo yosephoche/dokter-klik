@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Tambah Pengguna — DokterKlik{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <a href="{{ url('clinic-users') }}" class="text-gray-400 hover:text-gray-600 text-sm">← Daftar Pengguna</a>
+    <span class="text-gray-300">/</span>
+    <h1 class="text-xl font-bold">Tambah Pengguna Baru</h1>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <form method="post" action="{{ url('clinic-user-create') }}">
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
+
+      <div class="space-y-4">
+
+        <!-- Email -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Email <span class="text-red-500">*</span>
+          </label>
+          <input type="email" name="email" required autofocus
+                 value="{{ data.email if data else '' }}"
+                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                        {{ 'border-red-400' if errors.email else 'border-gray-300' }}">
+          {% if errors.email %}
+            <p class="text-red-500 text-xs mt-1">{{ errors.email }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Nama Depan & Belakang -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Depan</label>
+            <input type="text" name="first_name"
+                   value="{{ data.first_name if data else '' }}"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Belakang</label>
+            <input type="text" name="last_name"
+                   value="{{ data.last_name if data else '' }}"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <!-- Role -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Role <span class="text-red-500">*</span>
+          </label>
+          <select name="role" required
+                  class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                         {{ 'border-red-400' if errors.role else 'border-gray-300' }}">
+            <option value="">-- Pilih Role --</option>
+            {% for value, label in allowed_roles %}
+              <option value="{{ value }}" {{ 'selected' if data and data.role == value else '' }}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+          {% if errors.role %}
+            <p class="text-red-500 text-xs mt-1">{{ errors.role }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Password <span class="text-red-500">*</span>
+          </label>
+          <input type="password" name="password" required
+                 placeholder="Minimal 8 karakter"
+                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
+                        {{ 'border-red-400' if errors.password else 'border-gray-300' }}">
+          {% if errors.password %}
+            <p class="text-red-500 text-xs mt-1">{{ errors.password }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="mt-6 flex gap-3 justify-end">
+        <a href="{{ url('clinic-users') }}"
+           class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Batal</a>
+        <button type="submit"
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
+          Tambah Pengguna
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

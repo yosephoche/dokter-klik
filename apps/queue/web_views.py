@@ -3,25 +3,26 @@ import datetime
 import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import TemplateView
 
+from apps.core.utils import normalize_phone
 from .models import QueueEntry
 
 logger = logging.getLogger(__name__)
 
 
-def _normalize_phone(phone: str) -> str:
-    """Normalize phone to digits-only E.164 format without leading +.
-
-    Converts '0812...' → '62812...', strips spaces and dashes.
-    """
-    digits = ''.join(c for c in phone if c.isdigit())
-    if digits.startswith('0'):
-        digits = '62' + digits[1:]
-    return digits
+def _check_rate_limit(ip: str) -> bool:
+    """Return True if request is within limit (10 POST/minute per IP)."""
+    key = f'queue_register_ratelimit:{ip}'
+    count = cache.get(key, 0)
+    if count >= 10:
+        return False
+    cache.set(key, count + 1, 60)
+    return True
 
 
 class QueueManagePageView(LoginRequiredMixin, TemplateView):
@@ -122,6 +123,11 @@ class QueueOnlineRegisterView(View):
         from apps.patients.models import Patient
         from apps.accounts.models import CustomUser
 
+        ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+        ip = ip.split(',')[0].strip()
+        if not _check_rate_limit(ip):
+            return HttpResponse('Terlalu banyak permintaan. Coba lagi dalam 1 menit.', status=429)
+
         clinic, doctors = self._get_clinic_and_doctors(clinic_slug)
 
         name = request.POST.get('name', '').strip()
@@ -142,7 +148,15 @@ class QueueOnlineRegisterView(View):
                 'form': {'name': name, 'phone': phone_raw, 'doctor_id': doctor_id},
             })
 
-        phone = _normalize_phone(phone_raw)
+        phone = normalize_phone(phone_raw)
+        if not (10 <= len(phone) <= 15) or not phone.isdigit():
+            errors['phone'] = 'Nomor telepon tidak valid.'
+            return render(request, 'queue/online_register.html', {
+                'clinic': clinic,
+                'doctors': doctors,
+                'errors': errors,
+                'form': {'name': name, 'phone': phone_raw, 'doctor_id': doctor_id},
+            })
 
         # Cek apakah sudah punya antrian aktif hari ini
         today = datetime.date.today()

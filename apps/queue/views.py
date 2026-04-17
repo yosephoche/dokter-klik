@@ -31,10 +31,18 @@ class QueueListCreateView(generics.ListCreateAPIView):
             date = datetime.date.today()
         return QueueEntry.objects.filter(clinic=clinic, queue_date=date).order_by('queue_number')
 
-    def perform_create(self, serializer):
-        clinic = self.request.user.clinic
-        next_num = QueueEntry.get_next_number(clinic)
-        serializer.save(clinic=clinic, queue_number=next_num)
+    def create(self, request, *args, **kwargs):
+        clinic = request.user.clinic
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        vd = serializer.validated_data
+        entry = QueueEntry.create_for_clinic(
+            clinic=clinic,
+            patient=vd.get('patient'),
+            doctor=vd.get('doctor'),
+            source=vd.get('source', 'walkin'),
+        )
+        return Response(QueueEntrySerializer(entry).data, status=status.HTTP_201_CREATED)
 
 
 class QueueCallView(APIView):

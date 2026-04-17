@@ -4,15 +4,9 @@ import logging
 
 from django.core.cache import cache
 
+from apps.core.utils import normalize_phone as _normalize_phone
+
 logger = logging.getLogger(__name__)
-
-
-def _normalize_phone(phone: str) -> str:
-    """Normalize phone to digits-only E.164 format without leading +."""
-    digits = ''.join(c for c in phone if c.isdigit())
-    if digits.startswith('0'):
-        digits = '62' + digits[1:]
-    return digits
 
 
 class BookingChatbot:
@@ -119,17 +113,18 @@ class BookingChatbot:
         )
 
     def _handle_doctor(self, text: str) -> str:
+        from apps.accounts.models import CustomUser
+
         doctor_ids = self._state.get('doctor_ids', [])
         try:
             idx = int(text.strip()) - 1
             if 0 <= idx < len(doctor_ids):
-                from apps.accounts.models import CustomUser
                 doctor = CustomUser.objects.get(pk=doctor_ids[idx])
                 self._state['step'] = 'awaiting_confirm'
                 self._state['doctor_id'] = str(doctor.id)
                 self._save_state()
                 return self._confirm_message(doctor_name=doctor.full_name)
-        except (ValueError, Exception):
+        except (ValueError, CustomUser.DoesNotExist):
             pass
         return (
             f'Pilihan tidak valid. Balas dengan angka 1–{len(doctor_ids)} '

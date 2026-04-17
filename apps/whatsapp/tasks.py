@@ -31,7 +31,7 @@ def send_queue_alert(queue_entry_id: str):
             components=[{
                 'type': 'body',
                 'parameters': [
-                    {'type': 'text', 'text': entry.patient.name_search},
+                    {'type': 'text', 'text': entry.patient.name},
                     {'type': 'text', 'text': str(entry.queue_number)},
                     {'type': 'text', 'text': entry.clinic.name},
                 ],

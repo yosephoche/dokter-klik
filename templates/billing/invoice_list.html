@@ -3,15 +3,19 @@
 {% block title %}Billing — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold">Billing & Invoice</h1>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Billing & Invoice</h1>
+    <p class="page-subtitle">Kelola pembayaran pasien</p>
+  </div>
 </div>
 
-<!-- Invoice list loaded via HTMX -->
-<div id="invoice-list"
-     hx-get="{{ url('invoice-list-partial') }}"
-     hx-trigger="load"
-     hx-swap="innerHTML">
-  <p class="text-gray-400">Memuat invoice...</p>
+<div class="card" style="overflow:hidden;">
+  <div id="invoice-list"
+       hx-get="{{ url('invoice-list-partial') }}"
+       hx-trigger="load"
+       hx-swap="innerHTML">
+    <div style="padding:24px; text-align:center; color:#94a3b8; font-size:14px;">Memuat invoice...</div>
+  </div>
 </div>
 {% endblock %}

@@ -28,17 +28,28 @@ class WhatsAppWebhookView(APIView):
         return HttpResponse('Forbidden', status=403)
 
     def post(self, request):
-        """Handle incoming WhatsApp messages (Phase 2 — chatbot)."""
+        """Handle incoming WhatsApp messages — dispatch to chatbot via Celery."""
         data = request.data
         try:
             entry = data.get('entry', [{}])[0]
             changes = entry.get('changes', [{}])[0]
             value = changes.get('value', {})
+            phone_number_id = value.get('metadata', {}).get('phone_number_id', '')
             messages = value.get('messages', [])
+
             if messages:
                 msg = messages[0]
-                logger.info('Incoming WA message: %s', msg.get('type'))
-                # Phase 2: route to chatbot state machine
+                msg_type = msg.get('type')
+                sender_phone = msg.get('from', '')
+                logger.info('Incoming WA message type=%s from=%s', msg_type, sender_phone)
+
+                if msg_type == 'text':
+                    message_text = msg.get('text', {}).get('body', '').strip()
+                    if message_text and sender_phone and phone_number_id:
+                        from apps.whatsapp.tasks import process_whatsapp_message
+                        process_whatsapp_message.delay(
+                            phone_number_id, sender_phone, message_text
+                        )
         except Exception:
             logger.exception('Error processing WhatsApp webhook payload')
 

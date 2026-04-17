@@ -3,34 +3,47 @@
 {% block title %}Daftar Pasien — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold">Daftar Pasien</h1>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Daftar Pasien</h1>
+    <p class="page-subtitle">Kelola data pasien klinik</p>
+  </div>
   {% if request.user.role in ('admin', 'owner') %}
-  <a href="{{ url('patient-create') }}"
-     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
-    + Pasien Baru
+  <a href="{{ url('patient-create') }}" class="btn-primary">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+    </svg>
+    Pasien Baru
   </a>
   {% endif %}
 </div>
 
-<!-- Search bar with HTMX -->
-<div class="mb-4">
-  <input type="search"
-         name="q"
-         placeholder="Cari nama atau nomor RM..."
-         class="w-full md:w-96 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-         hx-get="{{ url('patient-list-partial') }}"
-         hx-trigger="input changed delay:300ms, search"
-         hx-target="#patient-list"
-         hx-swap="innerHTML"
-         hx-include="this">
+<!-- Search -->
+<div style="margin-bottom:16px;">
+  <div class="search-input-wrapper">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
+    </svg>
+    <input type="search"
+           name="q"
+           placeholder="Cari nama atau nomor RM..."
+           class="form-input"
+           style="width:320px; padding-left:36px;"
+           hx-get="{{ url('patient-list-partial') }}"
+           hx-trigger="input changed delay:300ms, search"
+           hx-target="#patient-list"
+           hx-swap="innerHTML"
+           hx-include="this">
+  </div>
 </div>
 
-<!-- Patient list (HTMX target) -->
-<div id="patient-list"
-     hx-get="{{ url('patient-list-partial') }}"
-     hx-trigger="load"
-     hx-swap="innerHTML">
-  <p class="text-gray-400">Memuat...</p>
+<!-- Patient list -->
+<div class="card" style="overflow:hidden;">
+  <div id="patient-list"
+       hx-get="{{ url('patient-list-partial') }}"
+       hx-trigger="load"
+       hx-swap="innerHTML">
+    <div style="padding:24px; text-align:center; color:#94a3b8; font-size:14px;">Memuat...</div>
+  </div>
 </div>
 {% endblock %}

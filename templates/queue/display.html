@@ -4,28 +4,104 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Antrean — {{ clinic.name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/htmx.org@1.9.12" crossorigin="anonymous"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background: #1e3a5f; color: white; }
-    .number-display { font-size: 8rem; font-weight: 900; line-height: 1; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(160deg, #042f2e 0%, #0c1a1a 50%, #0a1628 100%);
+      color: white;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .number-display {
+      font-size: 9rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #2dd4bf, #5eead4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    @media (max-width: 640px) {
+      .number-display { font-size: 5.5rem; }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.3); }
+      50%       { box-shadow: 0 0 0 24px rgba(13, 148, 136, 0); }
+    }
+
+    .queue-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+    }
+
+    .next-badge {
+      background: rgba(13, 148, 136, 0.2);
+      border: 1px solid rgba(13, 148, 136, 0.4);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5eead4;
+    }
+
+    .dot-live {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: #10b981;
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-8">
+<body>
 
-  <div class="text-center mb-8">
-    <h1 class="text-3xl font-bold opacity-80">{{ clinic.name }}</h1>
-    <p class="opacity-60 mt-1">Sistem Antrean Digital</p>
+  <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px;">
+
+    <!-- Clinic header -->
+    <div style="text-align:center; margin-bottom:40px;">
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:6px;">
+        <span class="dot-live"></span>
+        <span style="font-size:12px; color:#64748b; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">Live</span>
+      </div>
+      <h1 style="font-size:22px; font-weight:700; color:rgba(255,255,255,0.9); margin-bottom:4px;">{{ clinic.name }}</h1>
+      <p style="font-size:13px; color:#475569;">Sistem Antrean Digital</p>
+    </div>
+
+    <!-- Queue board - polls every 5 seconds -->
+    <div id="queue-board"
+         hx-get="{{ url('queue-live-partial', kwargs={'clinic_slug': clinic.slug}) }}"
+         hx-trigger="every 5s"
+         hx-swap="outerHTML"
+         style="width:100%; max-width:520px;">
+      {% include "queue/partials/queue_board.html" %}
+    </div>
+
+    <!-- Footer -->
+    <p style="margin-top:40px; font-size:12px; color:#334155; display:flex; align-items:center; gap:6px;">
+      <span class="dot-live"></span>
+      Diperbarui otomatis setiap 5 detik
+    </p>
   </div>
 
-  <!-- Live queue board — polls every 5 seconds -->
-  <div id="queue-board"
-       hx-get="{{ url('queue-live-partial', kwargs={'clinic_slug': clinic.slug}) }}"
-       hx-trigger="every 5s"
-       hx-swap="outerHTML">
-    {% include "queue/partials/queue_board.html" %}
-  </div>
-
-  <p class="mt-12 text-sm opacity-40">Diperbarui otomatis setiap 5 detik</p>
 </body>
 </html>

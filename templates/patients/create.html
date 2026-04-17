@@ -3,118 +3,124 @@
 {% block title %}Pasien Baru — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-  <div class="flex items-center gap-3 mb-6">
-    <a href="{{ url('patient-list-web') }}" class="text-gray-400 hover:text-gray-600 text-sm">← Daftar Pasien</a>
-    <span class="text-gray-300">/</span>
-    <h1 class="text-xl font-bold">Daftar Pasien Baru</h1>
+<div style="max-width:640px; margin:0 auto;">
+  <div style="margin-bottom:16px;">
+    <a href="{{ url('patient-list-web') }}" style="color:#94a3b8; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" onmouseover="this.style.color='#0d9488'" onmouseout="this.style.color='#94a3b8'">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Daftar Pasien
+    </a>
   </div>
 
+  <h1 class="page-title" style="margin-bottom:20px;">Daftar Pasien Baru</h1>
+
   {% if errors.__all__ %}
-  <div class="mb-4 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 text-sm">
+  <div style="margin-bottom:16px; padding:12px 16px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; color:#991b1b; font-size:13px;">
     {{ errors.__all__ }}
   </div>
   {% endif %}
 
-  <div class="bg-white rounded-xl shadow p-6">
+  <div class="card" style="overflow:hidden;">
     <form method="post" action="{{ url('patient-create') }}">
       <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div style="padding:24px;">
+        <h2 style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#94a3b8; margin-bottom:16px;">Identitas Pasien</h2>
 
-        <!-- Nama -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Nama Lengkap <span class="text-red-500">*</span>
-          </label>
-          <input type="text" name="name" required
-                 value="{{ data.name if data else '' }}"
-                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                        {{ 'border-red-400' if errors.name else 'border-gray-300' }}">
-          {% if errors.name %}
-            <p class="text-red-500 text-xs mt-1">{{ errors.name }}</p>
-          {% endif %}
-        </div>
+        <div style="display:grid; grid-template-columns:1fr; gap:16px;">
 
-        <!-- NIK -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">NIK</label>
-          <input type="text" name="nik" maxlength="16"
-                 value="{{ data.nik if data else '' }}"
-                 placeholder="16 digit NIK"
-                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
+          <!-- Nama -->
+          <div>
+            <label class="form-label">Nama Lengkap <span style="color:#ef4444;">*</span></label>
+            <input type="text" name="name" required
+                   value="{{ data.name if data else '' }}"
+                   class="form-input {% if errors.name %}error{% endif %}"
+                   placeholder="Nama lengkap pasien">
+            {% if errors.name %}
+              <p style="color:#ef4444; font-size:12px; margin-top:4px;">{{ errors.name }}</p>
+            {% endif %}
+          </div>
 
-        <!-- Tanggal Lahir -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
-          <input type="date" name="dob"
-                 value="{{ data.dob if data else '' }}"
-                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <!-- NIK -->
+            <div>
+              <label class="form-label">NIK</label>
+              <input type="text" name="nik" maxlength="16"
+                     value="{{ data.nik if data else '' }}"
+                     placeholder="16 digit NIK"
+                     class="form-input">
+            </div>
 
-        <!-- Jenis Kelamin -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Jenis Kelamin <span class="text-red-500">*</span>
-          </label>
-          <select name="gender" required
-                  class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                         {{ 'border-red-400' if errors.gender else 'border-gray-300' }}">
-            <option value="">Pilih...</option>
-            <option value="male" {{ 'selected' if data and data.gender == 'male' else '' }}>Laki-laki</option>
-            <option value="female" {{ 'selected' if data and data.gender == 'female' else '' }}>Perempuan</option>
-            <option value="other" {{ 'selected' if data and data.gender == 'other' else '' }}>Lainnya</option>
-          </select>
-          {% if errors.gender %}
-            <p class="text-red-500 text-xs mt-1">{{ errors.gender }}</p>
-          {% endif %}
-        </div>
+            <!-- Tanggal Lahir -->
+            <div>
+              <label class="form-label">Tanggal Lahir</label>
+              <input type="date" name="dob"
+                     value="{{ data.dob if data else '' }}"
+                     class="form-input">
+            </div>
+          </div>
 
-        <!-- No. Telepon -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
-          <input type="tel" name="phone"
-                 value="{{ data.phone if data else '' }}"
-                 placeholder="08xxxxxxxxxx"
-                 class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <!-- Jenis Kelamin -->
+            <div>
+              <label class="form-label">Jenis Kelamin <span style="color:#ef4444;">*</span></label>
+              <select name="gender" required
+                      class="form-input {% if errors.gender %}error{% endif %}">
+                <option value="">Pilih...</option>
+                <option value="male" {{ 'selected' if data and data.gender == 'male' else '' }}>Laki-laki</option>
+                <option value="female" {{ 'selected' if data and data.gender == 'female' else '' }}>Perempuan</option>
+                <option value="other" {{ 'selected' if data and data.gender == 'other' else '' }}>Lainnya</option>
+              </select>
+              {% if errors.gender %}
+                <p style="color:#ef4444; font-size:12px; margin-top:4px;">{{ errors.gender }}</p>
+              {% endif %}
+            </div>
 
-        <!-- Golongan Darah -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Golongan Darah</label>
-          <select name="blood_type"
-                  class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">Tidak diketahui</option>
-            {% for bt in ['A', 'B', 'AB', 'O', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
-              <option value="{{ bt }}" {{ 'selected' if data and data.blood_type == bt else '' }}>{{ bt }}</option>
-            {% endfor %}
-          </select>
-        </div>
+            <!-- No. Telepon -->
+            <div>
+              <label class="form-label">No. Telepon</label>
+              <input type="tel" name="phone"
+                     value="{{ data.phone if data else '' }}"
+                     placeholder="08xxxxxxxxxx"
+                     class="form-input">
+            </div>
+          </div>
 
-        <!-- Alamat -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
-          <textarea name="address" rows="2"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ data.address if data else '' }}</textarea>
-        </div>
+          <!-- Golongan Darah -->
+          <div style="max-width:200px;">
+            <label class="form-label">Golongan Darah</label>
+            <select name="blood_type" class="form-input">
+              <option value="">Tidak diketahui</option>
+              {% for bt in ['A', 'B', 'AB', 'O', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                <option value="{{ bt }}" {{ 'selected' if data and data.blood_type == bt else '' }}>{{ bt }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-        <!-- Catatan Alergi -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Alergi</label>
-          <textarea name="allergy_notes" rows="2"
-                    placeholder="Alergi obat, makanan, dll."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ data.allergy_notes if data else '' }}</textarea>
+          <!-- Alamat -->
+          <div>
+            <label class="form-label">Alamat</label>
+            <textarea name="address" rows="2" class="form-input" style="resize:vertical;" placeholder="Jl. ...">{{ data.address if data else '' }}</textarea>
+          </div>
+
+          <!-- Alergi -->
+          <div>
+            <label class="form-label">Catatan Alergi</label>
+            <textarea name="allergy_notes" rows="2"
+                      class="form-input" style="resize:vertical;"
+                      placeholder="Alergi obat, makanan, dll.">{{ data.allergy_notes if data else '' }}</textarea>
+          </div>
         </div>
       </div>
 
-      <div class="flex gap-3 mt-6 justify-end">
-        <a href="{{ url('patient-list-web') }}"
-           class="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">
-          Batal
-        </a>
-        <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+      <!-- Footer -->
+      <div style="padding:14px 24px; border-top:1px solid #f1f5f9; background:#fafafa; display:flex; justify-content:flex-end; gap:10px;">
+        <a href="{{ url('patient-list-web') }}" class="btn-secondary">Batal</a>
+        <button type="submit" class="btn-primary">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+          </svg>
           Simpan Pasien
         </button>
       </div>

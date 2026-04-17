@@ -1,12 +1,13 @@
 {% if results %}
   {% for item in results %}
-  <div class="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b last:border-0 text-sm"
+  <div style="padding:8px 14px; cursor:pointer; border-bottom:1px solid #f1f5f9; font-size:13.5px; transition:background 0.1s;"
        data-code="{{ item.code }}"
-       data-desc="{{ item.description_id if lang == 'id' else item.description_en }}">
-    <span class="font-mono font-bold text-blue-700 mr-2">{{ item.code }}</span>
-    <span class="text-gray-700">{{ item.description_id or item.description_en }}</span>
+       data-desc="{{ item.description_id if lang == 'id' else item.description_en }}"
+       onmouseover="this.style.background='#f0fdfa'" onmouseout="this.style.background=''">
+    <span style="font-family:monospace; font-weight:700; color:#0d9488; font-size:12.5px; margin-right:8px; background:#f0fdfa; padding:1px 5px; border-radius:3px;">{{ item.code }}</span>
+    <span style="color:#374151;">{{ item.description_id or item.description_en }}</span>
   </div>
   {% endfor %}
 {% else %}
-  <div class="px-3 py-2 text-sm text-gray-400">Tidak ada hasil ditemukan.</div>
+  <div style="padding:12px 14px; font-size:13px; color:#94a3b8; text-align:center;">Tidak ada hasil ditemukan.</div>
 {% endif %}

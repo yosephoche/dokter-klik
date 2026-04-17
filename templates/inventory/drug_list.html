@@ -3,26 +3,37 @@
 {% block title %}Inventori Obat — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold">Inventori Obat</h1>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Inventori Obat</h1>
+    <p class="page-subtitle">Stok dan manajemen farmasi</p>
+  </div>
 </div>
 
-<div class="mb-4">
-  <input type="search"
-         name="q"
-         placeholder="Cari nama obat atau generik..."
-         class="w-full md:w-96 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-         hx-get="{{ url('drug-list-partial') }}"
-         hx-trigger="input changed delay:300ms, search"
-         hx-target="#drug-list"
-         hx-swap="innerHTML"
-         hx-include="this">
+<div style="margin-bottom:16px;">
+  <div class="search-input-wrapper">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
+    </svg>
+    <input type="search"
+           name="q"
+           placeholder="Cari nama obat atau generik..."
+           class="form-input"
+           style="width:320px; padding-left:36px;"
+           hx-get="{{ url('drug-list-partial') }}"
+           hx-trigger="input changed delay:300ms, search"
+           hx-target="#drug-list"
+           hx-swap="innerHTML"
+           hx-include="this">
+  </div>
 </div>
 
-<div id="drug-list"
-     hx-get="{{ url('drug-list-partial') }}"
-     hx-trigger="load"
-     hx-swap="innerHTML">
-  <p class="text-gray-400">Memuat inventori...</p>
+<div class="card" style="overflow:hidden;">
+  <div id="drug-list"
+       hx-get="{{ url('drug-list-partial') }}"
+       hx-trigger="load"
+       hx-swap="innerHTML">
+    <div style="padding:24px; text-align:center; color:#94a3b8; font-size:14px;">Memuat inventori...</div>
+  </div>
 </div>
 {% endblock %}

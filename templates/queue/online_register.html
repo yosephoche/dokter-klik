@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Antrean — {{ clinic.name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(160deg, #f0fdfa 0%, #f1f5f9 100%);
+      min-height: 100vh;
+      margin: 0;
+    }
+    .input-field {
+      width: 100%;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #0f172a;
+      background: #f8fafc;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
+      background: white;
+    }
+    .input-field.error { border-color: #ef4444; }
+    .btn-submit {
+      width: 100%;
+      background: #0d9488;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-submit:hover { background: #0f766e; }
+  </style>
+</head>
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px;">
+  <div style="width:100%; max-width:400px;">
+
+    <!-- Header -->
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; background:#0d9488; border-radius:14px; margin-bottom:14px;">
+        <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+          <rect x="9" y="3" width="6" height="4" rx="1"/>
+          <path stroke-linecap="round" d="M9 12h6M9 16h4"/>
+        </svg>
+      </div>
+      <h1 style="font-size:20px; font-weight:800; color:#0f172a; letter-spacing:-0.02em;">{{ clinic.name }}</h1>
+      <p style="font-size:13px; color:#64748b; margin-top:4px;">Pendaftaran Antrean Online</p>
+    </div>
+
+    <!-- Form card -->
+    <div style="background:white; border-radius:16px; padding:28px; box-shadow:0 4px 24px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
+
+      <form method="POST" action="{{ url('queue-online-register', args=[clinic.slug]) }}" novalidate>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
+
+        <!-- Nama -->
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">
+            Nama Lengkap <span style="color:#ef4444;">*</span>
+          </label>
+          <input type="text" id="name" name="name"
+                 value="{{ form.name if form else '' }}"
+                 placeholder="Masukkan nama lengkap"
+                 class="input-field {% if errors.name %}error{% endif %}"
+                 required>
+          {% if errors.name %}
+            <p style="color:#ef4444; font-size:12px; margin-top:4px;">{{ errors.name }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Telepon -->
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">
+            Nomor Telepon / WhatsApp <span style="color:#ef4444;">*</span>
+          </label>
+          <input type="tel" id="phone" name="phone"
+                 value="{{ form.phone if form else '' }}"
+                 placeholder="Contoh: 08123456789"
+                 class="input-field {% if errors.phone %}error{% endif %}"
+                 required>
+          {% if errors.phone %}
+            <p style="color:#ef4444; font-size:12px; margin-top:4px;">{{ errors.phone }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Pilih Dokter -->
+        {% if doctors %}
+        <div style="margin-bottom:20px;">
+          <label style="display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">
+            Pilih Dokter
+            <span style="color:#94a3b8; font-weight:400;"> (opsional)</span>
+          </label>
+          <select id="doctor_id" name="doctor_id" class="input-field" style="appearance:auto;">
+            <option value="">— Tidak ada preferensi —</option>
+            {% for doctor in doctors %}
+              <option value="{{ doctor.id }}"
+                {% if form and form.doctor_id == doctor.id|string %}selected{% endif %}>
+                Dr. {{ doctor.full_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% else %}
+        <input type="hidden" name="doctor_id" value="">
+        {% endif %}
+
+        <button type="submit" class="btn-submit">Daftar Sekarang</button>
+      </form>
+    </div>
+
+    <!-- Link to live display -->
+    <p style="text-align:center; font-size:12.5px; color:#64748b; margin-top:16px;">
+      Pantau antrean secara langsung:
+      <a href="{{ url('queue-live', args=[clinic.slug]) }}" style="color:#0d9488; font-weight:600; text-decoration:none;">
+        Papan Antrean Live →
+      </a>
+    </p>
+  </div>
+</body>
+</html>

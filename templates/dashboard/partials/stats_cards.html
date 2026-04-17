@@ -1,21 +1,61 @@
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-  <div class="bg-white rounded-xl shadow p-4">
-    <p class="text-xs text-gray-500 mb-1">Antrean Hari Ini</p>
-    <p class="text-3xl font-bold text-blue-600">{{ stats.queue_total }}</p>
+
+  <div class="card p-5">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <span style="font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.04em;">Antrean Hari Ini</span>
+      <span style="width:32px; height:32px; background:#eff6ff; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+          <rect x="9" y="3" width="6" height="4" rx="1"/>
+          <path stroke-linecap="round" d="M9 12h6M9 16h4"/>
+        </svg>
+      </span>
+    </div>
+    <p style="font-size:32px; font-weight:800; color:#2563eb; line-height:1;">{{ stats.queue_total }}</p>
+    <p style="font-size:11px; color:#94a3b8; margin-top:4px;">total pendaftar</p>
   </div>
-  <div class="bg-white rounded-xl shadow p-4">
-    <p class="text-xs text-gray-500 mb-1">Sudah Dilayani</p>
-    <p class="text-3xl font-bold text-green-600">{{ stats.queue_served }}</p>
+
+  <div class="card p-5">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <span style="font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.04em;">Dilayani</span>
+      <span style="width:32px; height:32px; background:#f0fdf4; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </span>
+    </div>
+    <p style="font-size:32px; font-weight:800; color:#16a34a; line-height:1;">{{ stats.queue_served }}</p>
+    <p style="font-size:11px; color:#94a3b8; margin-top:4px;">selesai konsultasi</p>
   </div>
-  <div class="bg-white rounded-xl shadow p-4">
-    <p class="text-xs text-gray-500 mb-1">Menunggu</p>
-    <p class="text-3xl font-bold text-yellow-600">{{ stats.queue_waiting }}</p>
+
+  <div class="card p-5">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <span style="font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.04em;">Menunggu</span>
+      <span style="width:32px; height:32px; background:#fefce8; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+        </svg>
+      </span>
+    </div>
+    <p style="font-size:32px; font-weight:800; color:#ca8a04; line-height:1;">{{ stats.queue_waiting }}</p>
+    <p style="font-size:11px; color:#94a3b8; margin-top:4px;">dalam antrean</p>
   </div>
-  <div class="bg-white rounded-xl shadow p-4">
-    <p class="text-xs text-gray-500 mb-1">Pendapatan Hari Ini</p>
-    <p class="text-2xl font-bold text-gray-800">Rp {{ "{:,.0f}".format(stats.revenue_today) }}</p>
+
+  <div class="card p-5">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+      <span style="font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.04em;">Pendapatan</span>
+      <span style="width:32px; height:32px; background:#f0fdfa; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0d9488" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </span>
+    </div>
+    <p style="font-size:24px; font-weight:800; color:#0d9488; line-height:1;">Rp {{ "{:,.0f}".format(stats.revenue_today) }}</p>
+    <p style="font-size:11px; color:#94a3b8; margin-top:4px;">hari ini</p>
   </div>
+
 </div>
-<div class="mt-3 text-right">
-  <span class="text-xs text-gray-400">Total pasien terdaftar: {{ stats.total_patients }}</span>
+<div style="margin-top:10px; text-align:right;">
+  <span style="font-size:11px; color:#94a3b8;">Total pasien terdaftar: <strong style="color:#64748b;">{{ stats.total_patients }}</strong></span>
 </div>

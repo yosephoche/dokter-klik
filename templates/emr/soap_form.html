@@ -1,164 +1,204 @@
 {% extends "base.html" %}
 
-{% block title %}Form SOAP — {{ patient.name_search }} — DokterKlik{% endblock %}
+{% block title %}SOAP — {{ patient.name_search }} — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-  <div class="flex items-center justify-between mb-4">
+<div style="max-width:800px; margin:0 auto;">
+
+  <!-- Header -->
+  <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px;">
     <div>
-      <h1 class="text-xl font-bold">{{ patient.name_search }}</h1>
-      <p class="text-sm text-gray-500">RM: {{ patient.medical_record_number }} | {{ visit.visit_date|datetimeformat }}</p>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+        <a href="{{ url('visit-list-web') }}" style="color:#94a3b8; font-size:13px; text-decoration:none; display:flex; align-items:center; gap:4px;" onmouseover="this.style.color='#0d9488'" onmouseout="this.style.color='#94a3b8'">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Kunjungan
+        </a>
+        <span style="color:#e2e8f0;">/</span>
+        <span style="font-size:13px; color:#64748b;">{{ patient.name_search|title }}</span>
+      </div>
+      <h1 style="font-size:20px; font-weight:700; color:#0f172a; letter-spacing:-0.02em;">{{ patient.name_search|title }}</h1>
+      <p style="font-size:13px; color:#64748b; margin-top:2px;">
+        RM: <span style="font-family:monospace; font-weight:600;">{{ patient.medical_record_number }}</span>
+        &middot; {{ visit.visit_date|datetimeformat }}
+      </p>
     </div>
-    <span class="px-3 py-1 rounded-full text-sm font-medium
-      {% if visit.status == 'finalized' %}bg-green-100 text-green-800
-      {% else %}bg-yellow-100 text-yellow-800{% endif %}">
-      {{ visit.status|title }}
+    <span class="badge {% if visit.status == 'finalized' %}badge-finalized{% else %}badge-waiting{% endif %}" style="margin-top:4px;">
+      {% if visit.status == 'finalized' %}Difinalisasi{% else %}Draft{% endif %}
     </span>
   </div>
 
   <!-- Autosave indicator -->
-  <div id="autosave-status" class="text-xs text-gray-400 mb-4">
+  <div id="autosave-status" style="font-size:12px; color:#94a3b8; margin-bottom:18px; display:flex; align-items:center; gap:5px;">
+    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+    </svg>
     Autosave aktif — setiap 30 detik
   </div>
 
-  <!-- SOAP Form (autosave via HTMX) -->
-  <form id="soap-form"
-        hx-patch="{{ url('visit-autosave', args=[visit.id]) }}"
-        hx-trigger="every 30s"
-        hx-swap="none"
-        hx-on::after-request="document.getElementById('autosave-status').textContent = 'Tersimpan otomatis: ' + new Date().toLocaleTimeString('id-ID')">
-
-    <!-- Tabs -->
-    <div class="border-b mb-4">
-      <nav class="flex gap-2">
-        <button type="button" onclick="showTab('subjective')"
-                class="tab-btn px-4 py-2 border-b-2 border-blue-600 font-medium text-blue-600 text-sm">
-          Subjective (S)
-        </button>
-        <button type="button" onclick="showTab('objective')"
-                class="tab-btn px-4 py-2 border-b-2 border-transparent text-gray-500 text-sm hover:text-gray-700">
-          Objective (O)
-        </button>
-        <button type="button" onclick="showTab('assessment')"
-                class="tab-btn px-4 py-2 border-b-2 border-transparent text-gray-500 text-sm hover:text-gray-700">
-          Assessment (A)
-        </button>
-        <button type="button" onclick="showTab('plan')"
-                class="tab-btn px-4 py-2 border-b-2 border-transparent text-gray-500 text-sm hover:text-gray-700">
-          Plan (P)
-        </button>
-      </nav>
+  <div class="card" style="overflow:hidden;">
+    <!-- Tab pills -->
+    <div style="display:flex; gap:6px; padding:14px 16px 0; border-bottom:1px solid #f1f5f9;">
+      <button type="button" onclick="showTab('subjective')"
+              class="tab-pill active" id="tab-btn-subjective">
+        S — Subjective
+      </button>
+      <button type="button" onclick="showTab('objective')"
+              class="tab-pill" id="tab-btn-objective">
+        O — Objective
+      </button>
+      <button type="button" onclick="showTab('assessment')"
+              class="tab-pill" id="tab-btn-assessment">
+        A — Assessment
+      </button>
+      <button type="button" onclick="showTab('plan')"
+              class="tab-pill" id="tab-btn-plan">
+        P — Plan
+      </button>
     </div>
 
-    <!-- Tab: Subjective -->
-    <div id="tab-subjective" class="tab-content">
-      <div class="mb-4">
-        <label class="block text-sm font-medium mb-1">Keluhan Utama</label>
-        <textarea name="chief_complaint" rows="2"
-                  class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.chief_complaint or '' }}</textarea>
-      </div>
-      <div>
-        <label class="block text-sm font-medium mb-1">Anamnesis (Subjective)</label>
-        <textarea name="soap_subjective" rows="6"
-                  class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="Riwayat penyakit sekarang, riwayat penyakit dahulu, riwayat keluarga..."
-                  {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_subjective or '' }}</textarea>
-      </div>
-    </div>
+    <!-- SOAP Form -->
+    <form id="soap-form"
+          hx-patch="{{ url('visit-autosave', args=[visit.id]) }}"
+          hx-trigger="every 30s"
+          hx-swap="none"
+          hx-on::after-request="document.getElementById('autosave-status').innerHTML = '<svg width=\'12\' height=\'12\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'#16a34a\' stroke-width=\'2\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' d=\'M5 13l4 4L19 7\'/></svg> Tersimpan: ' + new Date().toLocaleTimeString('id-ID')"
+          style="padding:20px;">
 
-    <!-- Tab: Objective -->
-    <div id="tab-objective" class="tab-content hidden">
-      <label class="block text-sm font-medium mb-1">Pemeriksaan Fisik (Objective)</label>
-      <textarea name="soap_objective" rows="8"
-                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder="Tanda vital, pemeriksaan fisik, hasil laboratorium..."
-                {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_objective or '' }}</textarea>
-    </div>
-
-    <!-- Tab: Assessment -->
-    <div id="tab-assessment" class="tab-content hidden">
-      <label class="block text-sm font-medium mb-1">Penilaian Klinis (Assessment)</label>
-      <textarea name="soap_assessment_notes" rows="4"
-                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none mb-4"
-                {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_assessment_notes or '' }}</textarea>
-
-      <!-- ICD-10 Search -->
-      <div class="mt-4">
-        <label class="block text-sm font-medium mb-1">Kode Diagnosis ICD-10</label>
-        <input type="text"
-               id="icd10-search"
-               placeholder="Ketik nama penyakit atau kode ICD-10 (min 2 karakter)..."
-               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-               hx-get="{{ url('icd10-search-partial') }}"
-               hx-trigger="input changed delay:300ms"
-               hx-target="#icd10-results"
-               hx-swap="innerHTML"
-               hx-params="q,lang"
-               {% if visit.status == 'finalized' %}disabled{% endif %}>
-        <input type="hidden" name="lang" value="id">
-
-        <div id="icd10-results" class="border rounded-lg mt-1 max-h-48 overflow-y-auto hidden"></div>
-
-        <!-- Selected diagnoses -->
-        <div id="diagnosis-list" class="mt-3 space-y-2">
-          {% for diagnosis in visit.diagnoses.all() %}
-          <div class="flex items-center gap-2 bg-gray-50 rounded p-2 text-sm">
-            <span class="font-mono font-bold text-blue-700">{{ diagnosis.icd10_code }}</span>
-            <span>{{ diagnosis.icd10_description_id or diagnosis.icd10_description_en }}</span>
-            {% if diagnosis.is_primary %}
-              <span class="ml-auto bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">Primer</span>
-            {% endif %}
-          </div>
-          {% endfor %}
+      <!-- Tab: Subjective -->
+      <div id="tab-subjective" class="tab-content">
+        <div style="margin-bottom:16px;">
+          <label class="form-label">Keluhan Utama</label>
+          <textarea name="chief_complaint" rows="2"
+                    class="form-input"
+                    style="resize:vertical;"
+                    {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.chief_complaint or '' }}</textarea>
+        </div>
+        <div>
+          <label class="form-label">Anamnesis</label>
+          <textarea name="soap_subjective" rows="7"
+                    class="form-input"
+                    style="resize:vertical;"
+                    placeholder="Riwayat penyakit sekarang, riwayat penyakit dahulu, riwayat keluarga..."
+                    {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_subjective or '' }}</textarea>
         </div>
       </div>
-    </div>
 
-    <!-- Tab: Plan -->
-    <div id="tab-plan" class="tab-content hidden">
-      <label class="block text-sm font-medium mb-1">Rencana Tatalaksana (Plan)</label>
-      <textarea name="soap_plan_notes" rows="4"
-                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none mb-4"
-                {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_plan_notes or '' }}</textarea>
+      <!-- Tab: Objective -->
+      <div id="tab-objective" class="tab-content hidden">
+        <label class="form-label">Pemeriksaan Fisik</label>
+        <textarea name="soap_objective" rows="10"
+                  class="form-input"
+                  style="resize:vertical;"
+                  placeholder="Tanda vital, pemeriksaan fisik, hasil laboratorium..."
+                  {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_objective or '' }}</textarea>
+      </div>
 
-      <!-- Prescriptions -->
-      <div class="mt-4">
-        <label class="block text-sm font-medium mb-2">Resep Obat</label>
-        <div id="prescription-list" class="space-y-2 mb-3">
-          {% for rx in visit.prescriptions.all() %}
-          <div class="bg-gray-50 rounded p-2 text-sm flex justify-between">
-            <span>{{ rx.drug_name }} — {{ rx.quantity }} {{ rx.unit }}</span>
-            <span class="text-gray-500">{{ rx.dosage_instruction }}</span>
+      <!-- Tab: Assessment -->
+      <div id="tab-assessment" class="tab-content hidden">
+        <div style="margin-bottom:16px;">
+          <label class="form-label">Penilaian Klinis</label>
+          <textarea name="soap_assessment_notes" rows="4"
+                    class="form-input"
+                    style="resize:vertical;"
+                    {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_assessment_notes or '' }}</textarea>
+        </div>
+
+        <!-- ICD-10 Search -->
+        <div>
+          <label class="form-label">Kode Diagnosis ICD-10</label>
+          <div class="search-input-wrapper" style="display:block; position:relative;">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:#94a3b8; pointer-events:none;">
+              <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text"
+                   id="icd10-search"
+                   placeholder="Ketik nama penyakit atau kode ICD-10 (min 2 karakter)..."
+                   class="form-input"
+                   style="padding-left:36px;"
+                   hx-get="{{ url('icd10-search-partial') }}"
+                   hx-trigger="input changed delay:300ms"
+                   hx-target="#icd10-results"
+                   hx-swap="innerHTML"
+                   hx-params="q,lang"
+                   {% if visit.status == 'finalized' %}disabled{% endif %}>
+            <input type="hidden" name="lang" value="id">
+            <div id="icd10-results" class="card hidden" style="position:absolute; left:0; right:0; max-height:200px; overflow-y:auto; z-index:20; margin-top:4px;"></div>
           </div>
-          {% endfor %}
+
+          <!-- Selected diagnoses -->
+          <div id="diagnosis-list" style="margin-top:12px; display:flex; flex-direction:column; gap:6px;">
+            {% for diagnosis in visit.diagnoses.all() %}
+            <div style="display:flex; align-items:center; gap:10px; background:#f8fafc; border-radius:8px; padding:9px 12px; font-size:13.5px;">
+              <span style="font-family:monospace; font-weight:700; color:#0d9488; font-size:13px; background:#f0fdfa; padding:2px 7px; border-radius:4px;">{{ diagnosis.icd10_code }}</span>
+              <span style="color:#374151; flex:1;">{{ diagnosis.icd10_description_id or diagnosis.icd10_description_en }}</span>
+              {% if diagnosis.is_primary %}
+                <span style="font-size:11px; font-weight:700; color:#0d9488; background:#ccfbf1; padding:2px 8px; border-radius:9999px;">Primer</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
         </div>
       </div>
+
+      <!-- Tab: Plan -->
+      <div id="tab-plan" class="tab-content hidden">
+        <div style="margin-bottom:16px;">
+          <label class="form-label">Rencana Tatalaksana</label>
+          <textarea name="soap_plan_notes" rows="4"
+                    class="form-input"
+                    style="resize:vertical;"
+                    {% if visit.status == 'finalized' %}readonly{% endif %}>{{ visit.soap_plan_notes or '' }}</textarea>
+        </div>
+
+        <!-- Prescriptions -->
+        <div>
+          <label class="form-label" style="margin-bottom:10px;">Resep Obat</label>
+          <div id="prescription-list" style="display:flex; flex-direction:column; gap:6px;">
+            {% for rx in visit.prescriptions.all() %}
+            <div style="background:#f8fafc; border-radius:8px; padding:9px 12px; font-size:13.5px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span style="font-weight:600; color:#0f172a;">{{ rx.drug_name }}</span>
+                <span style="color:#64748b;"> — {{ rx.quantity }} {{ rx.unit }}</span>
+              </div>
+              <span style="font-size:12px; color:#94a3b8;">{{ rx.dosage_instruction }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- Finalize actions -->
+    {% if visit.status != 'finalized' %}
+    <div style="padding:14px 20px; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:10px; background:#fafafa;">
+      <button type="button"
+              class="btn-secondary"
+              hx-patch="{{ url('visit-autosave', args=[visit.id]) }}"
+              hx-include="#soap-form"
+              hx-swap="none">
+        Simpan Draft
+      </button>
+      <button type="button"
+              class="btn-primary"
+              style="background:#16a34a;"
+              onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'"
+              hx-post="{{ url('visit-finalize', args=[visit.id]) }}"
+              hx-include="#soap-form"
+              hx-confirm="Finalisasi kunjungan? Data tidak dapat diubah setelah ini."
+              hx-swap="none"
+              hx-on::after-request="window.location.reload()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+        Simpan &amp; Finalisasi
+      </button>
     </div>
-
-  </form>
-
-  <!-- Finalize button -->
-  {% if visit.status != 'finalized' %}
-  <div class="mt-6 flex justify-end gap-3">
-    <button type="button"
-            class="px-4 py-2 border rounded-lg hover:bg-gray-50"
-            hx-patch="{{ url('visit-autosave', args=[visit.id]) }}"
-            hx-include="#soap-form"
-            hx-swap="none">
-      Simpan Draft
-    </button>
-    <button type="button"
-            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium"
-            hx-post="{{ url('visit-finalize', args=[visit.id]) }}"
-            hx-include="#soap-form"
-            hx-confirm="Finalisasi kunjungan? Data tidak dapat diubah setelah ini."
-            hx-swap="none"
-            hx-on::after-request="window.location.reload()">
-      Simpan &amp; Finalisasi
-    </button>
+    {% endif %}
   </div>
-  {% endif %}
+
 </div>
 {% endblock %}
 
@@ -166,22 +206,17 @@
 <script>
 function showTab(name) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('border-blue-600', 'text-blue-600');
-    btn.classList.add('border-transparent', 'text-gray-500');
-  });
+  document.querySelectorAll('.tab-pill').forEach(btn => btn.classList.remove('active'));
   document.getElementById('tab-' + name).classList.remove('hidden');
-  event.target.classList.add('border-blue-600', 'text-blue-600');
-  event.target.classList.remove('border-transparent', 'text-gray-500');
+  document.getElementById('tab-btn-' + name).classList.add('active');
 }
 
-// ICD-10 search result click → add diagnosis
+// ICD-10 search result click
 document.getElementById('icd10-results').addEventListener('click', function(e) {
   const item = e.target.closest('[data-code]');
   if (!item) return;
   const code = item.dataset.code;
   const desc = item.dataset.desc;
-  // POST to add diagnosis via HTMX
   htmx.ajax('POST', '{{ url("diagnosis-list", kwargs={"visit_pk": visit.id}) }}', {
     target: '#diagnosis-list',
     swap: 'beforeend',
@@ -191,7 +226,6 @@ document.getElementById('icd10-results').addEventListener('click', function(e) {
   document.getElementById('icd10-search').value = '';
 });
 
-// Hide results when clicking outside
 document.addEventListener('click', function(e) {
   if (!e.target.closest('#icd10-search') && !e.target.closest('#icd10-results')) {
     document.getElementById('icd10-results').classList.add('hidden');

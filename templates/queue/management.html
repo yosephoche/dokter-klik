@@ -3,68 +3,102 @@
 {% block title %}Kelola Antrean — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-4">
-  <h1 class="text-2xl font-bold">Antrean Hari Ini</h1>
-  <div class="flex gap-3">
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Antrean Hari Ini</h1>
+    <p class="page-subtitle">Kelola antrean walk-in dan online</p>
+  </div>
+  <div style="display:flex; gap:10px; align-items:center;">
     {% if request.user.clinic %}
     <a href="{{ url('queue-live', kwargs={'clinic_slug': request.user.clinic.slug}) }}"
        target="_blank"
-       class="border px-3 py-2 rounded text-sm hover:bg-gray-50">
-      Tampilan Publik ↗
+       class="btn-secondary" style="font-size:13px;">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+      </svg>
+      Papan Publik
     </a>
     {% endif %}
-    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+    <button class="btn-secondary" style="font-size:13px;"
             hx-get="{{ url('queue-list-partial') }}"
             hx-target="#queue-entries"
             hx-swap="innerHTML">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
       Refresh
     </button>
   </div>
 </div>
 
 <!-- Form tambah antrean -->
-<div class="bg-white rounded-xl shadow p-4 mb-6">
-  <p class="text-sm font-medium text-gray-700 mb-3">Tambah Antrean Walk-in</p>
+<div class="card p-5" style="margin-bottom:20px;">
+  <p style="font-size:13px; font-weight:700; color:#0f172a; margin-bottom:14px; display:flex; align-items:center; gap:6px;">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#0d9488" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+    </svg>
+    Tambah Antrean Walk-in
+  </p>
   <form hx-post="{{ url('queue-entry-create') }}"
         hx-target="#queue-entries"
         hx-swap="innerHTML"
-        class="flex flex-wrap gap-3 items-end">
+        style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
 
     <!-- Patient search -->
-    <div class="flex-1 min-w-48">
-      <label class="block text-xs text-gray-500 mb-1">Cari Pasien (opsional)</label>
-      <input type="text"
-             id="patient-search-input"
-             name="q"
-             placeholder="Nama atau No. RM..."
-             autocomplete="off"
-             class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-             hx-get="{{ url('patient-list-partial') }}"
-             hx-trigger="input changed delay:300ms"
-             hx-target="#patient-dropdown"
-             hx-swap="innerHTML"
-             hx-include="this"
-             hx-params="q">
-      <input type="hidden" name="patient_id" id="patient_id_input">
-      <div id="patient-dropdown"
-           class="border rounded-lg mt-1 max-h-40 overflow-y-auto hidden bg-white shadow-md z-10 absolute"></div>
+    <div style="flex:1; min-width:220px; position:relative;">
+      <label class="form-label">Cari Pasien <span style="color:#94a3b8; font-weight:400;">(opsional)</span></label>
+      <div style="position:relative;">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="2"
+             style="position:absolute; left:11px; top:50%; transform:translateY(-50%); pointer-events:none; z-index:1;">
+          <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input type="text"
+               id="patient-search-input"
+               name="q"
+               placeholder="Cari nama atau No. RM..."
+               autocomplete="off"
+               class="form-input"
+               style="padding-left:34px;"
+               hx-get="{{ url('patient-list-partial') }}?dropdown=1"
+               hx-trigger="input changed delay:250ms, focus"
+               hx-target="#patient-dropdown"
+               hx-swap="innerHTML"
+               hx-include="this"
+               hx-params="q">
+        <input type="hidden" name="patient_id" id="patient_id_input">
+
+        <!-- Selected patient display (shown after selection) -->
+        <div id="patient-selected-display" style="display:none; position:absolute; right:8px; top:50%; transform:translateY(-50%); display:none; align-items:center; gap:6px;">
+          <span id="patient-selected-name" style="font-size:12px; font-weight:600; color:#0d9488;"></span>
+          <button type="button" id="patient-clear-btn"
+                  style="width:16px; height:16px; border-radius:50%; background:#f1f5f9; border:none; cursor:pointer; color:#94a3b8; display:flex; align-items:center; justify-content:center; padding:0; font-size:10px; line-height:1;">×</button>
+        </div>
+
+        <!-- Dropdown -->
+        <div id="patient-dropdown"
+             style="display:none; position:absolute; left:0; right:0; top:calc(100% + 4px); z-index:50;
+                    background:white; border:1.5px solid #e2e8f0; border-radius:12px;
+                    box-shadow:0 8px 24px rgba(0,0,0,0.12); overflow:hidden; max-height:280px; overflow-y:auto;">
+        </div>
+      </div>
     </div>
 
     <!-- Source -->
     <div>
-      <label class="block text-xs text-gray-500 mb-1">Sumber</label>
-      <select name="source"
-              class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <label class="form-label">Sumber</label>
+      <select name="source" class="form-input" style="width:auto;">
         <option value="walkin">Walk-in</option>
         <option value="whatsapp">WhatsApp</option>
         <option value="online">Online</option>
       </select>
     </div>
 
-    <button type="submit"
-            class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
-      + Tambah
+    <button type="submit" class="btn-primary">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      </svg>
+      Tambah
     </button>
   </form>
 </div>
@@ -73,31 +107,119 @@
      hx-get="{{ url('queue-list-partial') }}"
      hx-trigger="load, every 10s"
      hx-swap="innerHTML">
-  <p class="text-gray-400">Memuat antrean...</p>
+  <div style="padding:32px; text-align:center; color:#94a3b8; font-size:14px;">Memuat antrean...</div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Patient dropdown: when user clicks a patient row, fill hidden input
-document.getElementById('patient-dropdown').addEventListener('click', function(e) {
-  const row = e.target.closest('tr[data-patient-id]');
-  if (!row) return;
-  document.getElementById('patient_id_input').value = row.dataset.patientId;
-  document.getElementById('patient-search-input').value = row.dataset.patientName;
-  this.classList.add('hidden');
+const searchInput   = document.getElementById('patient-search-input');
+const hiddenInput   = document.getElementById('patient_id_input');
+const dropdown      = document.getElementById('patient-dropdown');
+const selectedDisp  = document.getElementById('patient-selected-display');
+const selectedName  = document.getElementById('patient-selected-name');
+const clearBtn      = document.getElementById('patient-clear-btn');
+
+function openDropdown() {
+  dropdown.style.display = 'block';
+}
+function closeDropdown() {
+  dropdown.style.display = 'none';
+}
+
+// Click on a dropdown item
+dropdown.addEventListener('click', function(e) {
+  const item = e.target.closest('.patient-dropdown-item');
+  if (!item) return;
+  const id   = item.dataset.patientId;
+  const name = item.dataset.patientName;
+
+  hiddenInput.value     = id;
+  searchInput.value     = name;
+  searchInput.style.paddingRight = '90px';
+
+  selectedName.textContent = name;
+  selectedDisp.style.display = 'flex';
+
+  closeDropdown();
+  searchInput.blur();
 });
 
-// Hide dropdown when clicking outside
+// Show dropdown on focus, trigger HTMX load
+searchInput.addEventListener('focus', function() {
+  openDropdown();
+  // HTMX will fire on "focus" trigger defined in hx-trigger
+});
+
+// Show/hide based on typing
+searchInput.addEventListener('input', function() {
+  if (hiddenInput.value) {
+    hiddenInput.value = '';
+    selectedDisp.style.display = 'none';
+    searchInput.style.paddingRight = '';
+  }
+  openDropdown();
+});
+
+// Clear selection
+clearBtn.addEventListener('click', function() {
+  hiddenInput.value = '';
+  searchInput.value = '';
+  searchInput.style.paddingRight = '';
+  selectedDisp.style.display = 'none';
+  dropdown.innerHTML = '';
+  closeDropdown();
+  searchInput.focus();
+});
+
+// Close when clicking outside
 document.addEventListener('click', function(e) {
   if (!e.target.closest('#patient-search-input') && !e.target.closest('#patient-dropdown')) {
-    document.getElementById('patient-dropdown').classList.add('hidden');
+    closeDropdown();
   }
 });
 
-document.getElementById('patient-search-input').addEventListener('input', function() {
-  if (this.value.length >= 2) {
-    document.getElementById('patient-dropdown').classList.remove('hidden');
+// Keyboard navigation
+searchInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeDropdown();
+    this.blur();
+  }
+  if (e.key === 'ArrowDown') {
+    const first = dropdown.querySelector('.patient-dropdown-item');
+    if (first) { e.preventDefault(); first.focus(); }
+  }
+});
+
+// Arrow key navigation within dropdown
+dropdown.addEventListener('keydown', function(e) {
+  const items = Array.from(dropdown.querySelectorAll('.patient-dropdown-item'));
+  const idx   = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' && idx < items.length - 1) {
+    e.preventDefault(); items[idx + 1].focus();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (idx === 0) searchInput.focus();
+    else if (idx > 0) items[idx - 1].focus();
+  } else if (e.key === 'Enter' && idx >= 0) {
+    e.preventDefault(); items[idx].click();
+  } else if (e.key === 'Escape') {
+    closeDropdown(); searchInput.focus();
+  }
+});
+
+// Make dropdown items keyboard-focusable
+document.body.addEventListener('htmx:afterSwap', function(e) {
+  if (e.detail.target === dropdown) {
+    dropdown.querySelectorAll('.patient-dropdown-item').forEach(function(item) {
+      item.setAttribute('tabindex', '0');
+      item.addEventListener('mouseenter', function() {
+        this.querySelector('.select-hint').style.opacity = '1';
+      });
+      item.addEventListener('mouseleave', function() {
+        this.querySelector('.select-hint').style.opacity = '0';
+      });
+    });
   }
 });
 </script>

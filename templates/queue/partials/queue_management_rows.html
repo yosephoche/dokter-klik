@@ -1,28 +1,34 @@
 {% if entries %}
-  <div class="space-y-2" id="queue-rows">
+  <div style="display:flex; flex-direction:column; gap:8px;" id="queue-rows">
     {% for entry in entries %}
-    <div class="flex items-center gap-3 bg-white rounded-lg border px-4 py-3 text-sm">
+    <div class="card" style="display:flex; align-items:center; gap:14px; padding:14px 16px;">
+
       <!-- Queue number -->
-      <span class="text-2xl font-bold text-blue-700 w-12 text-center">{{ entry.queue_number }}</span>
+      <div style="width:48px; height:48px; background:#eff6ff; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <span style="font-size:20px; font-weight:800; color:#2563eb; line-height:1;">{{ entry.queue_number }}</span>
+      </div>
 
       <!-- Patient info -->
-      <div class="flex-1 min-w-0">
-        <p class="font-medium truncate">
-          {{ entry.patient.name_search|title if entry.patient else 'Pasien tidak terdaftar' }}
+      <div style="flex:1; min-width:0;">
+        <p style="font-size:14px; font-weight:600; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          {{ entry.patient.name_search|title if entry.patient else 'Pasien Walk-in' }}
         </p>
-        <p class="text-xs text-gray-500">
-          {{ entry.source|title }}
-          {% if entry.doctor %} · Dr. {{ entry.doctor.full_name }}{% endif %}
+        <p style="font-size:12px; color:#94a3b8; margin-top:1px;">
+          {% if entry.source == 'walkin' %}Walk-in
+          {% elif entry.source == 'whatsapp' %}WhatsApp
+          {% elif entry.source == 'online' %}Online
+          {% else %}{{ entry.source|title }}{% endif %}
+          {% if entry.doctor %} &middot; Dr. {{ entry.doctor.full_name }}{% endif %}
         </p>
       </div>
 
       <!-- Status badge -->
-      <span class="px-2 py-1 rounded-full text-xs font-medium
-        {% if entry.status == 'waiting' %}bg-yellow-100 text-yellow-800
-        {% elif entry.status == 'called' %}bg-blue-100 text-blue-800
-        {% elif entry.status == 'serving' %}bg-green-100 text-green-800
-        {% elif entry.status == 'done' %}bg-gray-100 text-gray-600
-        {% else %}bg-red-100 text-red-700{% endif %}">
+      <span class="badge
+        {% if entry.status == 'waiting' %}badge-waiting
+        {% elif entry.status == 'called' %}badge-called
+        {% elif entry.status == 'serving' %}badge-serving
+        {% elif entry.status == 'done' %}badge-done
+        {% else %}badge-skipped{% endif %}">
         {% if entry.status == 'waiting' %}Menunggu
         {% elif entry.status == 'called' %}Dipanggil
         {% elif entry.status == 'serving' %}Dilayani
@@ -31,16 +37,17 @@
       </span>
 
       <!-- Action buttons -->
-      <div class="flex gap-2">
+      <div style="display:flex; gap:6px; flex-shrink:0;">
         {% if entry.status == 'waiting' %}
-          <button class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700"
+          <button class="btn-primary" style="font-size:12px; padding:6px 12px;"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "called"}'
                   hx-swap="none"
                   hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
             Panggil
           </button>
-          <button class="bg-red-100 text-red-700 text-xs px-3 py-1 rounded hover:bg-red-200"
+          <button style="font-size:12px; padding:6px 12px; background:#fee2e2; color:#991b1b; border:none; border-radius:8px; cursor:pointer; font-family:inherit; font-weight:600; transition:background 0.15s;"
+                  onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "skipped"}'
                   hx-swap="none"
@@ -48,7 +55,7 @@
             Lewati
           </button>
         {% elif entry.status == 'called' %}
-          <button class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700"
+          <button class="btn-success" style="font-size:12px; padding:6px 12px;"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "serving"}'
                   hx-swap="none"
@@ -56,12 +63,22 @@
             Layani
           </button>
         {% elif entry.status == 'serving' %}
-          <button class="bg-gray-600 text-white text-xs px-3 py-1 rounded hover:bg-gray-700"
+          <button style="font-size:12px; padding:6px 12px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; cursor:pointer; font-family:inherit; font-weight:600; transition:background 0.15s;"
+                  onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'"
                   hx-patch="{{ url('queue-call', args=[entry.id]) }}"
                   hx-vals='{"status": "done"}'
                   hx-swap="none"
                   hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
             Selesai
+          </button>
+        {% elif entry.status == 'skipped' %}
+          <button style="font-size:12px; padding:6px 12px; background:#fed7aa; color:#9a3412; border:none; border-radius:8px; cursor:pointer; font-family:inherit; font-weight:600; transition:background 0.15s;"
+                  onmouseover="this.style.background='#fdba74'" onmouseout="this.style.background='#fed7aa'"
+                  hx-patch="{{ url('queue-call', args=[entry.id]) }}"
+                  hx-vals='{"status": "called"}'
+                  hx-swap="none"
+                  hx-on::after-request="htmx.trigger('#queue-entries', 'load')">
+            Panggil Ulang
           </button>
         {% endif %}
       </div>
@@ -69,7 +86,13 @@
     {% endfor %}
   </div>
 {% else %}
-  <div class="text-center py-12 text-gray-400">
-    <p class="text-lg">Belum ada antrean hari ini.</p>
+  <div class="card empty-state">
+    <svg class="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+      <rect x="9" y="3" width="6" height="4" rx="1"/>
+      <path stroke-linecap="round" d="M9 12h6M9 16h4"/>
+    </svg>
+    <p class="empty-state-title">Belum ada antrean hari ini</p>
+    <p class="empty-state-sub">Tambahkan pasien walk-in atau tunggu pendaftaran online</p>
   </div>
 {% endif %}

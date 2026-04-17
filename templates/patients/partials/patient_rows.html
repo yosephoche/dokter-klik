@@ -1,48 +1,61 @@
 {% if patients %}
-  <table class="w-full text-sm">
+  <table class="data-table">
     <thead>
-      <tr class="border-b text-left text-gray-500">
-        <th class="pb-2 pr-4">No. RM</th>
-        <th class="pb-2 pr-4">Nama</th>
-        <th class="pb-2 pr-4">Tgl Lahir</th>
-        <th class="pb-2 pr-4">Jenis Kelamin</th>
-        <th class="pb-2 pr-4">Telepon</th>
-        <th class="pb-2">Aksi</th>
+      <tr>
+        <th>No. RM</th>
+        <th>Nama Pasien</th>
+        <th>Tgl Lahir</th>
+        <th>Jenis Kelamin</th>
+        <th>Telepon</th>
+        <th style="text-align:right;">Aksi</th>
       </tr>
     </thead>
     <tbody>
       {% for patient in patients %}
-      <tr class="border-b hover:bg-gray-50 cursor-pointer"
-          data-patient-id="{{ patient.id }}"
+      <tr data-patient-id="{{ patient.id }}"
           data-patient-name="{{ patient.name_search|title }}">
-        <td class="py-2 pr-4 font-mono text-xs text-gray-600">{{ patient.medical_record_number }}</td>
-        <td class="py-2 pr-4 font-medium">{{ patient.name_search|title }}</td>
-        <td class="py-2 pr-4 text-gray-600">
-          {{ patient.dob|datetimeformat('%d %b %Y') if patient.dob else '—' }}
+        <td>
+          <span style="font-family:monospace; font-size:12px; color:#64748b; background:#f1f5f9; padding:2px 7px; border-radius:4px;">
+            {{ patient.medical_record_number }}
+          </span>
         </td>
-        <td class="py-2 pr-4 text-gray-600">
+        <td style="font-weight:600; color:#0f172a;">{{ patient.name_search|title }}</td>
+        <td style="color:#64748b;">{{ patient.dob|datetimeformat('%d %b %Y') if patient.dob else '—' }}</td>
+        <td style="color:#64748b;">
           {% if patient.gender == 'male' %}Laki-laki
           {% elif patient.gender == 'female' %}Perempuan
           {% else %}—{% endif %}
         </td>
-        <td class="py-2 pr-4 text-gray-600">{{ patient.phone or '—' }}</td>
-        <td class="py-2 flex gap-3">
-          <a href="{{ url('visit-list-web') }}?patient={{ patient.id }}"
-             class="text-blue-600 hover:underline text-xs">Riwayat</a>
-          <button class="text-green-600 hover:underline text-xs bg-transparent border-0 p-0 cursor-pointer"
-                  hx-post="{{ url('visit-create') }}"
-                  hx-vals='{"patient_id": "{{ patient.id }}"}'
-                  hx-target="body"
-                  hx-push-url="true">
-            + Kunjungan
-          </button>
+        <td style="color:#64748b; font-size:13px;">{{ patient.phone or '—' }}</td>
+        <td style="text-align:right;">
+          <div style="display:inline-flex; gap:8px; align-items:center;">
+            <a href="{{ url('visit-list-web') }}?patient={{ patient.id }}"
+               style="font-size:12.5px; color:#2563eb; font-weight:600; text-decoration:none; padding:4px 10px; background:#eff6ff; border-radius:6px; transition:background 0.15s;"
+               onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+              Riwayat
+            </a>
+            <button style="font-size:12.5px; color:#065f46; font-weight:600; text-decoration:none; padding:4px 10px; background:#f0fdf4; border-radius:6px; border:none; cursor:pointer; font-family:inherit; transition:background 0.15s;"
+                    onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'"
+                    hx-post="{{ url('visit-create') }}"
+                    hx-vals='{"patient_id": "{{ patient.id }}"}'
+                    hx-target="body"
+                    hx-push-url="true">
+              + Kunjungan
+            </button>
+          </div>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 {% else %}
-  <div class="text-center py-10 text-gray-400">
-    <p>Tidak ada pasien ditemukan.</p>
+  <div class="empty-state">
+    <svg class="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path stroke-linecap="round" stroke-linejoin="round" d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+    </svg>
+    <p class="empty-state-title">Tidak ada pasien ditemukan</p>
+    <p class="empty-state-sub">Coba kata kunci lain atau tambah pasien baru</p>
   </div>
 {% endif %}

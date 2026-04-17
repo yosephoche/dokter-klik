@@ -1,6 +1,7 @@
 """Abstract base model for all DokterKlik models."""
 import uuid
 from django.db import models
+from apps.core.audit_models import AuditLog  # noqa: F401 — expose to Django migrations
 
 
 class BaseModel(models.Model):

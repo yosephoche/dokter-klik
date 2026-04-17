@@ -24,6 +24,12 @@ class PatientListPartialView(LoginRequiredMixin, View):
                 medical_record_number__istartswith=q
             )
         patients = qs.order_by('name_search')[:50]
+
+        # Compact dropdown mode for inline autocomplete widgets
+        if request.GET.get('dropdown') == '1':
+            return render(request, 'patients/partials/patient_search_dropdown.html',
+                          {'patients': patients, 'q': q})
+
         return render(request, 'patients/partials/patient_rows.html',
                       {'patients': patients})
 

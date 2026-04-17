@@ -74,3 +74,45 @@ class WhatsAppClient:
             ) from exc
         except requests.RequestException as exc:
             raise WhatsAppAPIError(f'WhatsApp request failed: {exc}') from exc
+
+    def send_text_message(self, to: str, body: str) -> dict:
+        """Send a free-text reply message (valid within 24h of user-initiated conversation).
+
+        Args:
+            to: recipient phone number (will be normalized to E.164)
+            body: plain text message body
+        """
+        if not getattr(settings, 'WHATSAPP_ENABLED', False):
+            logger.debug('WhatsApp disabled. Skipping text send to %s', to)
+            return {'skipped': True}
+
+        if not self.phone_number_id or not self.access_token:
+            raise WhatsAppAPIError('WhatsApp credentials not configured for this clinic.')
+
+        to_normalized = ''.join(c for c in to if c.isdigit())
+        if to_normalized.startswith('0'):
+            to_normalized = '62' + to_normalized[1:]
+
+        payload = {
+            'messaging_product': 'whatsapp',
+            'to': to_normalized,
+            'type': 'text',
+            'text': {'body': body},
+        }
+
+        url = f'{GRAPH_API_BASE}/{self.phone_number_id}/messages'
+        try:
+            resp = requests.post(
+                url,
+                json=payload,
+                headers={'Authorization': f'Bearer {self.access_token}'},
+                timeout=15,
+            )
+            resp.raise_for_status()
+            return resp.json()
+        except requests.HTTPError as exc:
+            raise WhatsAppAPIError(
+                f'WhatsApp API error: {exc.response.text}'
+            ) from exc
+        except requests.RequestException as exc:
+            raise WhatsAppAPIError(f'WhatsApp request failed: {exc}') from exc

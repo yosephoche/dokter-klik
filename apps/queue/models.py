@@ -56,3 +56,32 @@ class QueueEntry(BaseModel):
             clinic=clinic, queue_date=date
         ).aggregate(Max('queue_number'))
         return (result['queue_number__max'] or 0) + 1
+
+    @classmethod
+    def create_for_clinic(cls, clinic, patient=None, doctor=None, source='walkin'):
+        """Atomically assign the next queue number and create an entry.
+
+        Uses SELECT FOR UPDATE to prevent concurrent numbering races.
+        Retries up to 3 times on IntegrityError before raising.
+        """
+        from django.db import IntegrityError, transaction
+
+        today = datetime.date.today()
+        for attempt in range(3):
+            try:
+                with transaction.atomic():
+                    agg = cls.objects.select_for_update().filter(
+                        clinic=clinic, queue_date=today
+                    ).aggregate(Max('queue_number'))
+                    next_number = (agg['queue_number__max'] or 0) + 1
+                    return cls.objects.create(
+                        clinic=clinic,
+                        patient=patient,
+                        doctor=doctor,
+                        queue_number=next_number,
+                        source=source,
+                        status='waiting',
+                    )
+            except IntegrityError:
+                if attempt == 2:
+                    raise

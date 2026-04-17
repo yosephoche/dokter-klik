@@ -3,6 +3,11 @@ from .models import Patient
 
 
 class PatientSerializer(serializers.ModelSerializer):
+    # Declare encrypted fields explicitly as CharField so DRF doesn't treat
+    # them as BinaryField (which would attempt base64 encode/decode).
+    name = serializers.CharField()
+    nik = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+
     class Meta:
         model = Patient
         fields = [
@@ -16,6 +21,8 @@ class PatientSerializer(serializers.ModelSerializer):
 
 class PatientListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list/search views."""
+    name = serializers.CharField()
+
     class Meta:
         model = Patient
         fields = [

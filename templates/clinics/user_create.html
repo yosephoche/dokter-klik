@@ -3,57 +3,56 @@
 {% block title %}Tambah Pengguna — DokterKlik{% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto">
-  <div class="flex items-center gap-3 mb-6">
-    <a href="{{ url('clinic-users') }}" class="text-gray-400 hover:text-gray-600 text-sm">← Daftar Pengguna</a>
-    <span class="text-gray-300">/</span>
-    <h1 class="text-xl font-bold">Tambah Pengguna Baru</h1>
+<div style="max-width:500px; margin:0 auto;">
+  <div style="margin-bottom:16px;">
+    <a href="{{ url('clinic-users') }}" style="color:#94a3b8; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" onmouseover="this.style.color='#0d9488'" onmouseout="this.style.color='#94a3b8'">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Daftar Pengguna
+    </a>
   </div>
 
-  <div class="bg-white rounded-xl shadow p-6">
+  <h1 class="page-title" style="margin-bottom:20px;">Tambah Pengguna Baru</h1>
+
+  <div class="card" style="overflow:hidden;">
     <form method="post" action="{{ url('clinic-user-create') }}">
       <input type="hidden" name="csrfmiddlewaretoken" value="{{ get_csrf_token(request) }}">
 
-      <div class="space-y-4">
+      <div style="padding:24px; display:flex; flex-direction:column; gap:16px;">
 
-        <!-- Email -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Email <span class="text-red-500">*</span>
-          </label>
+          <label class="form-label">Email <span style="color:#ef4444;">*</span></label>
           <input type="email" name="email" required autofocus
                  value="{{ data.email if data else '' }}"
-                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                        {{ 'border-red-400' if errors.email else 'border-gray-300' }}">
+                 class="form-input {% if errors.email %}error{% endif %}"
+                 placeholder="email@klinik.com">
           {% if errors.email %}
-            <p class="text-red-500 text-xs mt-1">{{ errors.email }}</p>
+            <p style="color:#ef4444; font-size:12px; margin-top:4px;">{{ errors.email }}</p>
           {% endif %}
         </div>
 
-        <!-- Nama Depan & Belakang -->
-        <div class="grid grid-cols-2 gap-3">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Depan</label>
+            <label class="form-label">Nama Depan</label>
             <input type="text" name="first_name"
                    value="{{ data.first_name if data else '' }}"
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   class="form-input"
+                   placeholder="Nama depan">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Belakang</label>
+            <label class="form-label">Nama Belakang</label>
             <input type="text" name="last_name"
                    value="{{ data.last_name if data else '' }}"
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   class="form-input"
+                   placeholder="Nama belakang">
           </div>
         </div>
 
-        <!-- Role -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Role <span class="text-red-500">*</span>
-          </label>
+          <label class="form-label">Role <span style="color:#ef4444;">*</span></label>
           <select name="role" required
-                  class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                         {{ 'border-red-400' if errors.role else 'border-gray-300' }}">
+                  class="form-input {% if errors.role %}error{% endif %}">
             <option value="">-- Pilih Role --</option>
             {% for value, label in allowed_roles %}
               <option value="{{ value }}" {{ 'selected' if data and data.role == value else '' }}>
@@ -62,31 +61,28 @@
             {% endfor %}
           </select>
           {% if errors.role %}
-            <p class="text-red-500 text-xs mt-1">{{ errors.role }}</p>
+            <p style="color:#ef4444; font-size:12px; margin-top:4px;">{{ errors.role }}</p>
           {% endif %}
         </div>
 
-        <!-- Password -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            Password <span class="text-red-500">*</span>
-          </label>
+          <label class="form-label">Password <span style="color:#ef4444;">*</span></label>
           <input type="password" name="password" required
                  placeholder="Minimal 8 karakter"
-                 class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500
-                        {{ 'border-red-400' if errors.password else 'border-gray-300' }}">
+                 class="form-input {% if errors.password %}error{% endif %}">
           {% if errors.password %}
-            <p class="text-red-500 text-xs mt-1">{{ errors.password }}</p>
+            <p style="color:#ef4444; font-size:12px; margin-top:4px;">{{ errors.password }}</p>
           {% endif %}
         </div>
 
       </div>
 
-      <div class="mt-6 flex gap-3 justify-end">
-        <a href="{{ url('clinic-users') }}"
-           class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Batal</a>
-        <button type="submit"
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
+      <div style="padding:14px 24px; border-top:1px solid #f1f5f9; background:#fafafa; display:flex; justify-content:flex-end; gap:10px;">
+        <a href="{{ url('clinic-users') }}" class="btn-secondary">Batal</a>
+        <button type="submit" class="btn-primary">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
           Tambah Pengguna
         </button>
       </div>

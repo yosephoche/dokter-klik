@@ -31,6 +31,13 @@ class PrescriptionSerializer(serializers.ModelSerializer):
 class VisitSerializer(serializers.ModelSerializer):
     diagnoses = DiagnosisSerializer(many=True, read_only=True)
     prescriptions = PrescriptionSerializer(many=True, read_only=True)
+    # Encrypted fields must be declared as CharField so DRF doesn't treat them
+    # as BinaryField and attempt base64 encoding of the decrypted string.
+    chief_complaint = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_subjective = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_objective = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_assessment_notes = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_plan_notes = serializers.CharField(allow_blank=True, allow_null=True, required=False)
 
     class Meta:
         model = Visit
@@ -46,6 +53,12 @@ class VisitSerializer(serializers.ModelSerializer):
 
 class VisitAutosaveSerializer(serializers.ModelSerializer):
     """Minimal serializer for autosave PATCH — only SOAP fields."""
+    chief_complaint = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_subjective = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_objective = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_assessment_notes = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    soap_plan_notes = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+
     class Meta:
         model = Visit
         fields = [

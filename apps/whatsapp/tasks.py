@@ -45,6 +45,34 @@ def send_queue_alert(queue_entry_id: str):
 
 
 @shared_task(queue='notifications')
+def process_whatsapp_message(phone_number_id: str, sender_phone: str, message_text: str):
+    """Process an incoming WhatsApp text message through the booking chatbot."""
+    from apps.clinics.models import Clinic
+    from apps.whatsapp.chatbot import BookingChatbot
+    from apps.whatsapp.client import WhatsAppClient, WhatsAppAPIError
+
+    clinic = Clinic.objects.filter(
+        whatsapp_phone_number_id=phone_number_id, is_active=True
+    ).first()
+    if not clinic:
+        logger.warning('No active clinic found for phone_number_id=%s', phone_number_id)
+        return
+
+    try:
+        bot = BookingChatbot(clinic=clinic, sender_phone=sender_phone)
+        reply_text = bot.handle(message_text)
+    except Exception:
+        logger.exception('Chatbot error for clinic %s, phone %s', clinic.id, sender_phone)
+        return
+
+    client = WhatsAppClient(clinic)
+    try:
+        client.send_text_message(to=sender_phone, body=reply_text)
+    except WhatsAppAPIError:
+        logger.exception('Failed to send chatbot reply to %s', sender_phone)
+
+
+@shared_task(queue='notifications')
 def send_low_stock_alert(drug_id: str):
     """Send WhatsApp notification to clinic owner/admin about low drug stock."""
     from apps.inventory.models import Drug

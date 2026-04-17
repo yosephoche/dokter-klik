@@ -52,6 +52,7 @@ class QueueCallView(APIView):
             'waiting': ['called', 'skipped'],
             'called': ['serving', 'skipped'],
             'serving': ['done', 'skipped'],
+            'skipped': ['called'],
         }
         allowed = valid_transitions.get(entry.status, [])
         if new_status not in allowed:
